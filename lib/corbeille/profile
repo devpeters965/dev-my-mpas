@@ -1,0 +1,1048 @@
+
+import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
+import 'package:real_track/config/theme/assets.dart';
+import 'package:real_track/config/theme/style.dart';
+import 'package:real_track/core/constante/constant_var/const_var.dart';
+import 'package:real_track/core/constante/forms/customer_forms.dart';
+import 'package:real_track/core/constante/forms/customer_selected.dart';
+import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart';
+import 'package:real_track/feature/auth/data/model/user_info.dart';
+import 'package:real_track/feature/auth/domain/usercase/add_db.dart';
+import 'package:isar/isar.dart';
+
+class MyProfile extends StatefulWidget {
+   MyProfile({super.key, this.userModel});
+  final UserModel? userModel;
+
+  @override
+  State<MyProfile> createState() => _MyProfileState();
+}
+
+class _MyProfileState extends State<MyProfile> {
+
+  late bool showImage = false;
+  late Uint8List? _image ;
+  late String _imgesProile = "";
+  void selectImages() async{
+    XFile? _img = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(_img != null){
+      File imageFile = File(_img.path);
+      Uint8List uint8list = await imageFile.readAsBytes();
+      setState(() {
+        _imgesProile = imageFile.path;
+        _image = uint8list;
+        print('------------------ image name: $_imgesProile');
+
+        if(_imgesProile.isNotEmpty){
+            Future.delayed(Duration(seconds: 3)).then((value) {
+              setState(() {
+                showImage = true;
+              });
+            }
+            );
+        } 
+      });
+    }
+  }
+
+  final newLocalDB = LocatData();
+  late  UserModel   userEditing = UserModel(
+  id: Isar.autoIncrement,
+   managerNames: managerName.text,
+   bussiness: bussinessName.text,
+   phoneName: phoneNumber.text,
+   email: emailControler.text,
+   desciption: passwordControler.text,
+   commune: userCommune as String, images: '_image!' );
+
+  final emailControler = TextEditingController();
+  final passwordControler = TextEditingController();
+
+
+   @override
+  void initState() {
+    super.initState();
+ if (widget.userModel != null) {
+      emailControler.text = widget.userModel!.email;
+      passwordControler.text = widget.userModel!.desciption;
+    }
+  }
+
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    log(emailControler.text);
+    log(passwordControler.text);
+
+    if(widget.userModel != null){
+        userEditing = widget.userModel!.copyWith(
+      managerNames: managerName.text,
+      bussiness: bussinessName.text,
+      phoneName: phoneNumber.text,
+      email: emailControler.text,
+      desciption: passwordControler.text,
+      commune: userCommune as String,
+      image: '_image'
+     );
+     newLocalDB.saveData(editProfile: userEditing);
+     return;
+    }
+
+    
+
+    newLocalDB.saveData(editProfile: userEditing);
+    managerName.dispose();
+    bussinessName.dispose();
+    phoneNumber.dispose();
+    mysemail.dispose();
+    emailControler.dispose();
+    passwordControler.dispose();
+
+    log('${newLocalDB.saveData(editProfile: userEditing)}');
+  }
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        iconTheme: const IconThemeData(
+          color: Colors.white
+        ),
+        backgroundColor: Colors.black,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            // padding: EdgeInsets.symmetric(vertical: 9.h, horizontal: 3.w),
+            child: Column(
+          
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Stack(
+                    children:[
+                       _imgesProile == ''?
+                       Container(
+                             height: 200.h,
+                             width: 200.w,
+                             decoration: const BoxDecoration(
+                              // color: Colors.red,
+                              shape: BoxShape.circle
+                             ),
+                        child: SvgPicture.asset("assets/icons/Online world-cuate.svg"),
+                       )
+                       :
+
+                       ClipRRect(
+                         child: Image.file(File(_imgesProile))),
+
+                    Positioned(
+                      bottom: 9.h,
+                       right: 10.h,
+                      // left: 10.h,
+                      child: Align(
+                        alignment: Alignment(0.3, 0.5 ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: MyColors.greens,
+                            shape: BoxShape.circle
+                          ),
+                          child: IconButton(
+                                  onPressed: (){
+                                    selectImages();
+                                  }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
+                        ),),
+                    )
+                    ]
+                  )
+                ),
+
+                 SizedBox(
+                   height: 9.h,
+                  ),
+          
+              (widget.userModel == null )?
+                     Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                                   showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter le Manager name ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'Manager name',
+                                        textController: managerName,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );     
+                   
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(left: 5.sp),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text('manager name',
+                                // userItem.managerNames
+                                  style: GoogleFonts.poppins(fontSize: 20.sp)
+                                  ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 4.sp),
+
+                          GestureDetector(
+                            onTap:() {
+                                 showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter le nom du Business ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'Business name',
+                                        textController: bussinessName,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );     
+                   
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(left: 5.sp),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text('bussines',
+                                // userItem.bussiness
+                                  style: GoogleFonts.poppins(fontSize: 20.sp)
+                                  ),
+                              ),
+                            ),
+                          ),
+
+
+                            Row(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                       GestureDetector(
+                            onTap: () {
+                               showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter un contact ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'Contact',
+                                        textController: phoneNumber,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );
+                            },
+                            
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                              child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(9.sp),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.black12.withOpacity(0.3),
+                                   borderRadius: BorderRadius.circular(5.sp)
+                                  ),
+                                  child: Icon(Icons.phone) ,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text('userItem.phoneName',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11.sp
+                                ),)
+                              ],
+                            ),
+                            ),
+                          ),
+                            
+                           GestureDetector(
+                            onTap: () {
+                               showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter un nouveau mail ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                       CustomerForm(
+                                        label: 'Email',
+                                        textController: emailControler,
+                                        ),
+                                      Text("Voullez vous apporter des modification ?",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );
+                              },
+                            
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                              child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(9.sp),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.black12.withOpacity(0.3),
+                                   borderRadius: BorderRadius.circular(5.sp)
+                                  ),
+                                  child: Icon(Icons.email) ,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text('userItem.email',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11.sp
+                                ),)
+                              ],
+                            ),
+                            ),
+                          ),
+                            
+                            
+                           GestureDetector(
+                            onTap: () { 
+                             showDialog(context: context, builder: ((context) => 
+                              AlertDialog(
+                                title: Text("Selectioner un Commune",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 19
+                                ),),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    
+                                      CustomerSelected(
+                                      label: '',
+                                      inputTitle: "Abidjan", items: communeAbidjan,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          userCommune = value;
+                                          print("___________ ${userCommune}");
+                                        });
+                                      },
+                                      ),
+                                    Text("Voullez vous apporter des modification ?",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18
+                                ),),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.pop(context);
+                                      // Navigator.pop(context);
+                                    },
+                                    child: const Text("Proceed")
+                                    ),
+                            
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("Yes")
+                                    )  
+                                ],
+                              )
+                            
+                              )
+                              );
+                            },
+                            
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                              child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(9.sp),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.black12.withOpacity(0.3),
+                                   borderRadius: BorderRadius.circular(5.sp)
+                                  ),
+                                  child: Icon(Icons.place_sharp) ,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text('userItem.commune',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11.sp
+                                ),)
+                              ],
+                            ),
+                            ),
+                          )
+                    
+                    ],
+                  ),
+                  
+                  GestureDetector(
+                    onTap: () {
+                           showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter une description ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'description',
+                                        textController: desciption,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );     
+                    },
+                    child: Text("Description",
+                    style: GoogleFonts.poppins(fontSize: 23.sp)
+                  ),),
+                  
+                  
+                  SizedBox(
+                     height: 14.h,
+                    ),
+                  Container(
+                    padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                         SizedBox(
+                            width: MediaQuery.sizeOf(context).width/2,
+                            child:  Text(
+                              'userItem.desciption',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16.sp
+                              ),
+                                textAlign: TextAlign.start,
+                                )
+                          ),
+                       
+                        Expanded(
+                          child: SvgPicture.asset(AssetsFile.socialMediasvg,
+                          width: MediaQuery.sizeOf(context).width/2,
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                               
+                        ],
+                )
+                 
+                 :  Container(
+                  height: MediaQuery.sizeOf(context).height,
+                  // color: Colors.black,
+                  child: StreamBuilder<List<UserModel>>(
+                    stream: LocatData().allEdit(),
+                     builder: (context , snapshort){
+                      if(snapshort.hasData){
+                        print("-------- data isSvace into local db ");
+                      }
+                      if(!snapshort.hasData){
+                        print("-------- data isNotSvace into local db ");
+                      }
+                  
+                      final userInfo = snapshort.data;
+                  
+                      return ListView.builder(
+                        itemCount: userInfo!.length,
+                        itemBuilder: (context, index){
+                          final userItem = userInfo[index];
+                  
+                  
+                        return Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                               showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter le Manager name ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'Manager name',
+                                        textController: managerName,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );     
+                   
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(left: 5.sp),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text( userItem.managerNames,
+                                // userItem.managerNames
+                                  style: GoogleFonts.poppins(fontSize: 20.sp)
+                                  ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 4.sp),
+
+                          Container(
+                            margin: EdgeInsets.only(left: 5.sp),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(userItem.bussiness,
+                              // userItem.bussiness
+                                style: GoogleFonts.poppins(fontSize: 20.sp)
+                                ),
+                            ),
+                          ),
+
+
+                            Row(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                       GestureDetector(
+                            onTap: () {
+                               showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter un contact ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'Contact',
+                                        textController: phoneNumber,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );
+                            },
+                            
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                              child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(9.sp),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.black12.withOpacity(0.3),
+                                   borderRadius: BorderRadius.circular(5.sp)
+                                  ),
+                                  child: Icon(Icons.phone) ,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(userItem.phoneName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11.sp
+                                ),)
+                              ],
+                            ),
+                            ),
+                          ),
+                            
+                           GestureDetector(
+                            onTap: () {
+                               showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter un nouveau mail ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                       CustomerForm(
+                                        label: 'Email',
+                                        textController: emailControler,
+                                        ),
+                                      Text("Voullez vous apporter des modification ?",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );
+                              },
+                            
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                              child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(9.sp),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.black12.withOpacity(0.3),
+                                   borderRadius: BorderRadius.circular(5.sp)
+                                  ),
+                                  child: Icon(Icons.email) ,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(userItem.email,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11.sp
+                                ),)
+                              ],
+                            ),
+                            ),
+                          ),
+                            
+                            
+                           GestureDetector(
+                            onTap: () { 
+                             showDialog(context: context, builder: ((context) => 
+                              AlertDialog(
+                                title: Text("Selectioner un Commune",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 19
+                                ),),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    
+                                      CustomerSelected(
+                                      label: '',
+                                      inputTitle: "Abidjan", items: communeAbidjan,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          userCommune = value;
+                                          print("___________ ${userCommune}");
+                                        });
+                                      },
+                                      ),
+                                    Text("Voullez vous apporter des modification ?",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18
+                                ),),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.pop(context);
+                                      // Navigator.pop(context);
+                                    },
+                                    child: const Text("Proceed")
+                                    ),
+                            
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("Yes")
+                                    )  
+                                ],
+                              )
+                            
+                              )
+                              );
+                            },
+                            
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                              child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(9.sp),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.black12.withOpacity(0.3),
+                                   borderRadius: BorderRadius.circular(5.sp)
+                                  ),
+                                  child: Icon(Icons.place_sharp) ,
+                                ),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Text(userItem.commune,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11.sp
+                                ),)
+                              ],
+                            ),
+                            ),
+                          )
+                    
+                    ],
+                  ),
+                  
+                  GestureDetector(
+                    onTap: () {
+                           showDialog(context: context, builder: ((context) => 
+                                AlertDialog(
+                                  title: Text("Ajouter une description ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 19
+                                  ),),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomerForm(
+                                        label: 'description',
+                                        textController: desciption,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text("Voullez vous apporter des modification ? ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                  ),),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: const Text("Proceed")
+                                      ),
+                            
+                                    TextButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Yes")
+                                      )  
+                                  ],
+                                )
+                            
+                                )
+                                );     
+                    },
+                    child: Text('description',
+                    style: GoogleFonts.poppins(fontSize: 23.sp)
+                  ),),
+                  
+                  
+                  SizedBox(
+                     height: 14.h,
+                    ),
+                  Container(
+                    padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                         SizedBox(
+                            width: MediaQuery.sizeOf(context).width/2,
+                            child:  Text(
+                              userItem.desciption,
+                              style: GoogleFonts.poppins(
+                                fontSize: 16.sp
+                              ),
+                                textAlign: TextAlign.start,
+                                )
+                          ),
+                       
+                        Expanded(
+                          child: SvgPicture.asset(AssetsFile.socialMediasvg,
+                          width: MediaQuery.sizeOf(context).width/2,
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                               
+                        ],
+                      );
+                  
+                      });
+                        }),
+                )
+          
+               
+                      
+                  
+                
+
+
+               
+               ],
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton:  FloatingActionButton(
+        backgroundColor: MyColors.greens,
+        onPressed: (){
+           showDialog(context: context, builder: ((context) => 
+                  AlertDialog(
+                    title: Text("Enregister votre modification.",
+                    style: GoogleFonts.poppins(
+                      fontSize: 19
+                    ),),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // LottieBuilder.asset(AssetsFile.deletedJson),
+                        Lottie.asset(AssetsFile.validerJson),
+                        Text("Voullez vous apouver ces modification ?",
+                          style: GoogleFonts.poppins(
+                            fontSize: 18
+                    ),),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: (){
+                          CreatUser().upLoadData(_image!);
+                          Navigator.pop(context);
+                          // Navigator.pop(context);
+
+                          
+                        },
+                        child: const Text("Proceed")
+                        ),
+
+                      TextButton(
+                        onPressed: (){
+                          Navigator.push(context, MaterialPageRoute(builder: ((context) => 
+                          MyProfile()
+                          )));
+                          
+                        },
+                        child: const Text("Yes")
+                        )  
+                    ],
+                  )
+
+                  )
+                  );
+        },
+        child:Text(
+          "Modifier",
+          style: GoogleFonts.poppins(color: MyColors.black, fontSize: 10.sp)),
+        )
+    );
+  }
+}

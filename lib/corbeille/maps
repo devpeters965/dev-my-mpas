@@ -1,0 +1,1234 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
+import 'package:mabox/src/data/api_repository.dart';
+import 'package:mabox/src/data/local_repository.dart';
+import 'package:mabox/src/features/site_geographique/logic/site_geographique_bloc.dart';
+import 'package:mabox/src/features/site_geographique/models/event/site_geographique_event.dart';
+import 'package:mabox/src/models/site_geographique/sitegeographique_model.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class WideButton extends StatelessWidget {
+  const WideButton(this.text,
+      {Key? key,
+      required,
+      this.padding = 0.0,
+      this.height = 45,
+      required this.onPressed,
+      required this.backgroundcolor})
+      : super(key: key);
+
+  /// Should be inside a column, row or flex widget
+  final String text;
+  final double padding;
+  final double height;
+  final Color backgroundcolor;
+  final void Function() onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      width: MediaQuery.of(context).size.width <= 500
+          ? MediaQuery.of(context).size.width
+          : 350,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: padding),
+        child: ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(backgroundcolor),
+          ),
+          onPressed: onPressed,
+          child: Text(text),
+        ),
+      ),
+    );
+  }
+}
+
+// ignore: must_be_immutable
+class OpenStreetMapSearchAndPick extends StatefulWidget {
+  final LatLong center;
+  final void Function(PickedData pickedData) onPicked;
+  final void Function(List values) values;
+  Color buttonColor;
+  String buttonText;
+  OpenStreetMapSearchAndPick({
+    Key? key,
+    required this.center,
+    required this.onPicked,
+    required this.values,
+    this.buttonColor = Colors.white,
+    this.buttonText = 'Set Current Location',
+  }) : super(key: key);
+
+  @override
+  State<OpenStreetMapSearchAndPick> createState() =>
+      _OpenStreetMapSearchAndPickState();
+}
+
+class _OpenStreetMapSearchAndPickState
+    extends State<OpenStreetMapSearchAndPick> {
+  MapController _mapController = MapController();
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  List<OSMdata> _options = <OSMdata>[];
+  LatLng? position = null;
+  int? editId;
+
+  bool isSaved = false;
+  bool isDelete = false;
+
+  Timer? _debounce;
+  var client = http.Client();
+  Location location = new Location();
+
+  void setNameCurrentPos() async {
+    double latitude = _mapController.center.latitude;
+    double longitude = _mapController.center.longitude;
+    if (kDebugMode) {}
+    if (kDebugMode) {}
+    String url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
+
+    var response = await client.post(Uri.parse(url));
+    var decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+
+      _searchController.text = await decodedResponse['display_name'] ?? " MOVE TO CURRENT POSITION";
+    setState(() {});
+    print('------------------- longitude $latitude et latitude $longitude');
+  }
+
+  void setNameCurrentPosAtInit() async {
+
+    double latitude = widget.center.latitude;
+    double longitude = widget.center.longitude;
+    // if (kDebugMode) {
+    //   print(latitude);
+    // }
+    // if (kDebugMode) {
+    //   print(longitude);
+    // }
+    String url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
+
+    var response = await client.post(Uri.parse(url));
+    var decodedResponse = await
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    _searchController.text = await decodedResponse['display_name'];
+
+    // print(decodedResponse);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _mapController = MapController();
+
+    setNameCurrentPosAtInit();
+
+    _mapController.mapEventStream.listen((event) async {
+      // print(event);
+      if (event is MapEventMoveEnd) {
+        var client = http.Client();
+        String url =
+            'https://nominatim.openstreetmap.org/reverse?format=json&lat=${event.camera.center.latitude}&lon=${event.camera.center.longitude}&zoom=18&addressdetails=1';
+
+        var response = await client.post(Uri.parse(url));
+        var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes))
+            as Map<dynamic, dynamic>;
+        // print(decodedResponse);
+        _searchController.text = await decodedResponse['display_name'];
+        // position = LatLng(event.center.latitude, event.center.longitude);
+
+        setState(() {});
+      }
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    OutlineInputBorder inputBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: widget.buttonColor),
+    );
+    OutlineInputBorder inputFocusBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: widget.buttonColor, width: 3.0),
+    );
+
+    return SizedBox(
+      height: 2.2.sh,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              height: .6.sh,
+
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                      child: FlutterMap(
+                    options: MapOptions(
+             
+
+                        onTap: (tapPosition, point) {
+
+                           setState(()  {
+                             position = point;
+                             
+                            //  await _mapController.move(point, 21);
+                             pickData().then((value) {
+                              _searchController.text = value.address;
+
+                             });
+
+                              print('------------- INFORMATION------------ ${position!.latitude} ${position!.longitude}');
+                            
+                
+                           });
+                        },
+
+                        initialCenter:
+                         position != null
+                            ? position!
+                            : 
+                            LatLng(widget.center.latitude,
+                                widget.center.longitude),
+                        
+                        zoom: 17.0,
+                        maxZoom: 18,
+                        minZoom: 6),
+                    mapController: _mapController,
+                    children: [
+                      TileLayer(
+                        urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                        // fallbackUrl: 'https://www.openstreetmap.org/"',
+                        subdomains: ['a', 'b', 'c'],
+                        // attributionBuilder: (_) {
+                        //   return Text("© OpenStreetMap contributors");
+                        // },
+                      ),
+                      MarkerLayer(
+                        rotate: true,
+                        markers: [
+                          Marker(
+                            width: 20,
+                            height: 20,
+                            point: position ??
+                                LatLng(widget.center.latitude,
+                                       widget.center.longitude),
+                            rotate: true,
+                            child: Icon(
+                              Icons.location_on_rounded,
+                              size: 30,
+                              shadows: [
+                                BoxShadow(
+                                  color: Colors.black,
+                                  spreadRadius: 3,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                              color: Color(0xff42aae2),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  )),
+                
+                
+                
+                  Positioned(
+                      bottom: 150,
+                      right: 5,
+                      child: FloatingActionButton(
+                        heroTag: 'btn1',
+                        backgroundColor: Colors.white,
+                        onPressed: () {
+                          // print('ok');
+                          _mapController.move(
+                              _mapController.center, _mapController.zoom + 1);
+                          pickData().then((value) {
+                            position = LatLng(value.latLong.latitude,
+                                value.latLong.longitude);
+                            _searchController.text = value.address;
+                            setState(() {});
+
+                            widget.onPicked(value);
+                          });
+                        },
+                        child: const Icon(Icons.zoom_in_map),
+                      )),
+                  Positioned(
+                      bottom: 90,
+                      right: 5,
+                      child: FloatingActionButton(
+                        heroTag: 'btn2',
+                        backgroundColor: Colors.white,
+                        onPressed: () {
+                          _mapController.move(
+                              _mapController.center, _mapController.zoom - 1);
+                          pickData().then((value) {
+                            position = LatLng(value.latLong.latitude,
+                                value.latLong.longitude);
+                            setState(() {});
+
+                            widget.onPicked(value);
+                          });
+                        },
+                        child: const Icon(Icons.zoom_out_map),
+                      )),
+                  Positioned(
+                      bottom: 30,
+                      right: 5,
+                      child: FloatingActionButton(
+                        heroTag: 'btn3',
+                        backgroundColor: Colors.white,
+                        onPressed: () async {
+                          final _locationData = await location.getLocation();
+
+                          _mapController.move(
+                              LatLng(
+                                  _locationData.latitude ??
+                                      widget.center.latitude,
+                                  _locationData.longitude ??
+                                      widget.center.longitude),
+                              _mapController.zoom);
+                          setNameCurrentPos();
+                        },
+                        child: Icon(Icons.my_location),
+                      )),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      margin: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                              controller: _searchController,
+                              focusNode: _focusNode,
+                              decoration: InputDecoration(
+                                hintText: 'Rechercher un lieu',
+                                border: inputBorder,
+                                focusedBorder: inputFocusBorder,
+                              ),
+                              onChanged: (String value) async{
+                                if (_debounce?.isActive ?? false)
+                                  _debounce?.cancel();
+
+                                _debounce =
+                                    Timer(const Duration(milliseconds: 2000),
+                                    // milliseconds: 2000
+                                        () async {
+                                  // if (kDebugMode) {
+                                  //   print(value);
+                                  // }
+                                  var client = http.Client();
+                                  try {
+                                    String url =
+                                        'https://nominatim.openstreetmap.org/search?countrycodes=CI&q=$value&format=json&polygon_geojson=1&addressdetails=1';
+                                    // if (kDebugMode) {
+                                    //   print(url);
+                                    // }
+                                    var response =
+                                        await client.get(Uri.parse(url));
+                                    var decodedResponse = jsonDecode(
+                                            utf8.decode(response.bodyBytes)) as List<dynamic>;
+                                             print('----------------api response    $decodedResponse');
+
+                                    // var decodedResponse = json.decode(response.body);
+                                    //     print('----------------api response    $decodedResponse');
+                                        // as List<dynamic>;
+                                    // if (kDebugMode) {
+                                    //   print(decodedResponse);
+                                    // }
+                                    _options = decodedResponse
+                                        .map((e) => OSMdata(
+                                            displayname: e['display_name'],
+                                            lat: double.parse(e['lat']),
+                                            lon: double.parse(e['lon'])))
+                                        .toList();
+
+                                    _options.forEach((element) {
+                                      position =
+                                          LatLng(element.lat, element.lon);
+                                         print('----------------api latitude   ${element.lat}');
+                                        
+                                        
+                                    });
+
+                                    setState(() {});
+                                  } finally {
+                                    client.close();
+                                  }
+
+                                  setState(() {});
+                                });
+                              }),
+                          
+                          StatefulBuilder(builder: ((context, setState) {
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount:
+                                    _options.length > 5 ? 5 : _options.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text(_options[index].displayname),
+                                    subtitle: Text(
+                                        '${_options[index].lat},${_options[index].lon}'),
+                                    onTap: () {
+                                      _mapController.move(
+                                          LatLng(_options[index].lat,
+                                              _options[index].lon),
+                                          15.0);
+                                      pickData().then((value) {
+                                        position = LatLng(
+                                            value.latLong.latitude,
+                                            value.latLong.longitude);
+                                        _searchController.text = value.address;
+
+                                        setState(() {});
+
+                                        widget.onPicked(value);
+                                      });
+
+                                      _focusNode.unfocus();
+                                      _options.clear();
+                                      setState(() {});
+                                    },
+                                  );
+                                });
+                          })),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            BlocBuilder<SiteGeographiqueBloc, List<SiteGeographiqueModel>>(
+              builder: (context, datas) {
+                return Container(
+                  decoration: BoxDecoration(
+                      color: Color(0xffE3E3E3),
+                      borderRadius: BorderRadius.circular(10)),
+                  height: 260,
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                'Nom',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 12, color: Color(0xff818181)),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 40,
+                                child: Stack(
+                                  children: [
+                                    TextField(
+                                      controller: _searchController,
+                                      // maxLines: 2,
+                                      style: GoogleFonts.roboto(fontSize: 10),
+                                      decoration: InputDecoration(
+                                          fillColor: Colors.white,
+                                          filled: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
+                                          border: InputBorder.none,
+                                          hintStyle:
+                                              GoogleFonts.roboto(fontSize: 12)),
+                                    ),
+                                    if (_searchController.text.isNotEmpty)
+                                      Positioned(
+                                          top: 10,
+                                          bottom: 10,
+                                          right: 0,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(right: 3),
+                                            child: GestureDetector(
+                                              onTap: (() {
+                                                _searchController.clear();
+                                              }),
+                                              child: CircleAvatar(
+                                                  backgroundColor: Colors.grey,
+                                                  radius: 7,
+                                                  child: FittedBox(
+                                                      child: Icon(
+                                                    Icons.close,
+                                                    color: Colors.white,
+                                                  ))),
+                                            ),
+                                          ))
+                                  ],
+                                ),
+                                width: double.infinity,
+                              ),
+                              Text(
+                                'Coordonnées',
+                                style: GoogleFonts.roboto(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                'Longitude',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 12, color: Color(0xff818181)),
+                              ),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(
+                                  position != null &&
+                                          _searchController.text
+                                              .trim()
+                                              .isNotEmpty
+                                      ? position!.longitude.toString()
+                                      : 'aucune donnee',
+                                  style: GoogleFonts.roboto(fontSize: 12),
+                                ),
+                                width: double.infinity,
+                                height: 35,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                'Latitude',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 12, color: Color(0xff818181)),
+                              ),
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Text(
+                                  position != null &&
+                                          _searchController.text
+                                              .trim()
+                                              .isNotEmpty
+                                      ? position!.latitude.toString()
+                                      : 'aucune donne',
+                                  style: GoogleFonts.roboto(fontSize: 12),
+                                ),
+                                width: double.infinity,
+                                height: 35,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: (() async {
+                                      isSaved = true;
+                                      setState(() {});
+                                      final clientId = json.decode(
+                                          (await context
+                                              .read<LocalRepository>()
+                                              .getbox('step_one_result'))!);
+
+                                      if (editId != null) {
+                                        final data = SiteGeographiqueModel(
+                                            clientId: clientId['items'][0]
+                                                ['clientId'],
+                                            latitude: position!.latitude,
+                                            longitude: position!.longitude,
+                                            clientNom: clientId['items'][0]
+                                                ['clientNom'],
+                                            libelle: _searchController.text,
+                                            createdAt:
+                                                DateTime.now().toString(),
+                                            id: editId);
+
+                                        context
+                                            .read<SiteGeographiqueBloc>()
+                                            .add(SiteGeographiqueEvent.update(
+                                                data));
+
+                                        var datasSiteGeographique = [];
+                                        // datasSiteGeographique
+                                        //     .add({'id': editId});
+                                        datas.forEach((element) {
+                                          datasSiteGeographique
+                                              .add({'id': element.id});
+                                        });
+
+                                        // updatedSite
+
+                                        var updatedatasSiteGeographique =
+                                            <OSMdata>[];
+
+                                        datas.forEach((element) {
+                                          updatedatasSiteGeographique.add(
+                                              OSMdata(
+                                                  displayname:
+                                                      _searchController.text,
+                                                  lat: position!.latitude,
+                                                  lon: position!.longitude));
+                                        });
+
+                                        isSaved = false;
+                                        setState(() {});
+
+                                        // print(
+                                        //     '-------------+++++++++++++++++++');
+                                        // print(
+                                        //     updatedatasSiteGeographique.length);
+
+                                        widget.values(datasSiteGeographique);
+
+                                        _searchController.clear();
+                                        editId = null;
+
+                                        setState(() {});
+                                        return;
+                                      }
+
+                                      final data = OSMdata(
+                                          displayname: _searchController.text,
+                                          lat: position!.latitude,
+                                          lon: position!.longitude);
+
+                                      (await context
+                                              .read<ApiRepository>()
+                                              .uploadService
+                                              .createSiteGeographique(
+                                                  id: clientId['items'][0]
+                                                      ['clientId'],
+                                                  datasSiteGeographique: [
+                                            data
+                                          ]))
+                                          .fold((l) {
+                                        isSaved = false;
+                                        setState(() {});
+                                        showTopSnackBar(
+                                          Overlay.of(context),
+                                          CustomSnackBar.error(
+                                            message: "$l",
+                                          ),
+                                        );
+                                      }, (r) async {
+                                        isSaved = false;
+                                        setState(() {});
+                                        final idSiteGeo =
+                                            ((json.decode(r))['items']
+                                                as List)[0]['id'];
+                                        final data = SiteGeographiqueModel(
+                                            clientId: clientId['items'][0]
+                                                ['clientId'],
+                                            latitude: position!.latitude,
+                                            longitude: position!.longitude,
+                                            clientNom: clientId['items'][0]
+                                                ['clientNom'],
+                                            libelle: _searchController.text,
+                                            createdAt:
+                                                DateTime.now().toString(),
+                                            id: idSiteGeo);
+
+                                        context
+                                            .read<SiteGeographiqueBloc>()
+                                            .add(SiteGeographiqueEvent.create(
+                                                data));
+
+                                        // print(
+                                        //     "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+                                        // print(idSiteGeo);
+
+                                        // print(
+                                        //     "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                                        // print(idSiteGeo);
+                                        var datasSiteGeographique = [];
+                                        datasSiteGeographique
+                                            .add({'id': idSiteGeo});
+
+                                        datas.forEach((element) {
+                                          datasSiteGeographique
+                                              .add({'id': element.id});
+                                        });
+
+                                        print('DATAS $datas');
+                                        showTopSnackBar(
+                                          Overlay.of(context),
+                                          CustomSnackBar.success(
+                                            message: "Nouveau site enregistré",
+                                          ),
+                                        );
+
+                                        // print("datasSiteGeographique");
+                                        // print(datasSiteGeographique);
+
+                                        widget.values(datasSiteGeographique);
+                                      });
+
+                                      // print(
+                                      //     '------------------------${datas.length}---------------------');
+
+                                      _searchController.clear();
+                                      setState(() {});
+                                    }),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Color(0XffFF7800),
+                                          borderRadius:
+                                              BorderRadius.circular(4)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 4),
+                                      child: isSaved
+                                          ? SizedBox(
+                                              height: 10,
+                                              width: 10,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : Text(
+                                              editId != null
+                                                  ? 'mise à jour'
+                                                  : 'Enregistrer',
+                                              style: GoogleFonts.roboto(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
+                                    ),
+                                  ),
+                                  editId != null
+                                      ? TextButton(
+                                          onPressed: (() {
+                                            setState(() {
+                                              editId = null;
+                                              // position!.latitude = 0;
+                                              // position!.longitude = 0;
+                                              _searchController.clear();
+                                            });
+                                          }),
+                                          child: Text('annuler'))
+                                      : SizedBox()
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                            ],
+                          ),
+                        )),
+                        Expanded(
+                            flex: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Liste des sites',
+                                      style: GoogleFonts.roboto(fontSize: 16),
+                                    ),
+                                    if (isDelete)
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child:
+                                                  CircularProgressIndicator()),
+                                        ],
+                                      )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 11,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 20),
+                                  width: double.infinity,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 7),
+                                        decoration: BoxDecoration(
+                                            color: Color(0xffA3A3A3),
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text('Site'),
+                                            Text('Longitude'),
+                                            Text('Latitude'),
+                                            Text('Actions'),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      Flexible(child: BlocBuilder<
+                                          SiteGeographiqueBloc,
+                                          List<SiteGeographiqueModel>>(
+                                        builder: (context, state) {
+
+                                          print('-------------Etat de la maps $state');
+
+                                          return ListView(
+                                            children: [
+                                              ...state
+                                                  .map(
+                                                    (e) {
+                                                      print('-------------clientId ${e.clientId} ');
+
+
+                                                      return Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 5,
+                                                              horizontal: 10),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Container(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                e.libelle ??
+                                                                    e.clientNom ??
+                                                                    '',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: GoogleFonts
+                                                                    .roboto(
+                                                                        fontSize:
+                                                                            10),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Container(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                e.longitude
+                                                                    .toString(),
+                                                                style: GoogleFonts
+                                                                    .roboto(
+                                                                        fontSize:
+                                                                            10),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Container(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                e.latitude
+                                                                    .toString(),
+                                                                style: GoogleFonts
+                                                                    .roboto(
+                                                                        fontSize:
+                                                                            10),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                              child: Row(
+                                                            children: [
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    () async {
+                                                                  isDelete =
+                                                                      true;
+                                                                  setState(
+                                                                      () {});
+
+                                                                  final resultPopUp =
+                                                                      await showDialog(
+                                                                          context:
+                                                                              context,
+                                                                          builder: (_) =>
+                                                                              AlertDialog(
+                                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                                                                                content: Builder(
+                                                                                  builder: (context) {
+                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                    var width = MediaQuery.of(context).size.width;
+
+                                                                                    return Container(
+                                                                                      alignment: Alignment.center,
+                                                                                      child: Column(
+                                                                                        children: [
+                                                                                          Expanded(
+                                                                                              child: Container(
+                                                                                            child: ListTile(
+                                                                                              contentPadding: const EdgeInsets.symmetric(horizontal: 7),
+                                                                                              title: Column(
+                                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                children: [
+                                                                                                  //  ${state[index].nom}
+                                                                                                  Text(
+                                                                                                    'Voulez-vous vraiment supprimer ce Site :',
+                                                                                                    style: GoogleFonts.roboto(fontSize: 6.sp, fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                  SizedBox(
+                                                                                                    height: 2.sp,
+                                                                                                  ),
+                                                                                                  Text(
+                                                                                                    '${e.libelle}',
+                                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                                    style: GoogleFonts.roboto(fontSize: 5.sp, color: Colors.red, fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ],
+                                                                                              ),
+                                                                                            ),
+                                                                                          )),
+                                                                                          Expanded(
+                                                                                              child: Container(
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.end,
+                                                                                              children: [
+                                                                                                ElevatedButton(
+                                                                                                    style: ElevatedButton.styleFrom(backgroundColor: Color(0xff000000), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3))),
+                                                                                                    onPressed: (() {
+                                                                                                      Navigator.of(context).pop(false);
+                                                                                                    }),
+                                                                                                    child: Container(
+                                                                                                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                                                                                                      child: Text(
+                                                                                                        'NON',
+                                                                                                        style: GoogleFonts.roboto(color: Colors.white),
+                                                                                                      ),
+                                                                                                    )),
+                                                                                                SizedBox(
+                                                                                                  width: 10,
+                                                                                                ),
+                                                                                                ElevatedButton(
+                                                                                                    style: ElevatedButton.styleFrom(backgroundColor: Color(0xffFF6E00), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3))),
+                                                                                                    onPressed: (() {
+                                                                                                      Navigator.of(context).pop(true);
+                                                                                                    }),
+                                                                                                    child: Container(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 2), child: Text('OUI', style: GoogleFonts.roboto(color: Colors.white))))
+                                                                                              ],
+                                                                                            ),
+                                                                                          )),
+                                                                                        ],
+                                                                                      ),
+                                                                                      height: height - .8.sh,
+                                                                                      width: width - .8.sh,
+                                                                                    );
+                                                                                  },
+                                                                                ),
+                                                                              ));
+
+                                                                  if (!resultPopUp) {
+                                                                    setState(
+                                                                        () {
+                                                                      isDelete =
+                                                                          false;
+                                                                    });
+                                                                    return;
+                                                                  }
+                                                                  // print(
+                                                                  //     '----------------------debut ${state.length}');
+                                                                  final result = state
+                                                                      .where(((element) =>
+                                                                          element
+                                                                              .id !=
+                                                                          e.id))
+                                                                      .toList();
+
+                                                                  // print(
+                                                                  //     '----------------------filtre ${result.length}');
+
+                                                                  var datasSiteGeographique =
+                                                                      [];
+                                                                  // datasSiteGeographique
+                                                                  //     .add({'id': editId});
+                                                                  result.forEach(
+                                                                      (element) {
+                                                                    datasSiteGeographique
+                                                                        .add({
+                                                                      'id':
+                                                                          element
+                                                                              .id
+                                                                    });
+                                                                  });
+                                                                  final clientId =
+                                                                      json.decode((await context
+                                                                          .read<
+                                                                              LocalRepository>()
+                                                                          .getbox(
+                                                                              'step_one_result'))!);
+
+                                                                  (await context
+                                                                          .read<
+                                                                              ApiRepository>()
+                                                                          .uploadService
+                                                                          .createExpressionNextStepFour(
+                                                                              id: clientId['items'][0]['id'],
+                                                                              datasSiteGeographique: datasSiteGeographique))
+                                                                      .fold((l) {
+                                                                    isDelete =
+                                                                        false;
+                                                                    setState(
+                                                                        () {});
+                                                                    showTopSnackBar(
+                                                                      Overlay.of(
+                                                                          context),
+                                                                      CustomSnackBar
+                                                                          .error(
+                                                                        message:
+                                                                            "$l",
+                                                                      ),
+                                                                    );
+                                                                  }, (r) {
+                                                                    widget.values(
+                                                                        datasSiteGeographique);
+                                                                    isDelete =
+                                                                        false;
+                                                                    setState(
+                                                                        () {});
+                                                                    showTopSnackBar(
+                                                                      Overlay.of(
+                                                                          context),
+                                                                      CustomSnackBar
+                                                                          .success(
+                                                                        message:
+                                                                            "site supprimé",
+                                                                      ),
+                                                                    );
+                                                                  });
+
+                                                                  context
+                                                                      .read<
+                                                                          SiteGeographiqueBloc>()
+                                                                      .add(SiteGeographiqueEvent
+                                                                          .delete(
+                                                                              e));
+                                                                },
+                                                                child:
+                                                                    CircleAvatar(
+                                                                        radius:
+                                                                            10,
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .transparent,
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.delete,
+                                                                            color:
+                                                                                Colors.black,
+                                                                            size:
+                                                                                17,
+                                                                          ),
+                                                                        )),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              GestureDetector(
+                                                                onTap:
+                                                                    () async {
+                                                                  String url =
+                                                                      'https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latitude}&lon=${e.longitude}&zoom=18&addressdetails=1';
+
+                                                                  var response =
+                                                                      await client
+                                                                          .post(
+                                                                              Uri.parse(url));
+                                                                  var decodedResponse = jsonDecode(
+                                                                      utf8.decode(
+                                                                          response
+                                                                              .bodyBytes)) as Map<
+                                                                      dynamic,
+                                                                      dynamic>;
+
+                                                                  _searchController
+                                                                      .text = e
+                                                                          .libelle ??
+                                                                      decodedResponse[
+                                                                          'display_name'];
+
+                                                                  position = LatLng(
+                                                                      e.latitude,
+                                                                      e.longitude);
+                                                                  e.latitude;
+
+                                                                  print(
+                                                                      decodedResponse);
+
+                                                                  editId = e.id;
+
+                                                                  // position = LatLng(
+                                                                  //     latitude!,
+                                                                  //     longitude!);
+
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                                child:
+                                                                    CircleAvatar(
+                                                                        radius:
+                                                                            10,
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .transparent,
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.edit,
+                                                                            color:
+                                                                                Colors.black,
+                                                                            size:
+                                                                                17,
+                                                                          ),
+                                                                        )),
+                                                              ),
+                                                            ],
+                                                          )),
+                                                        ],
+                                                      ),
+                                                    );
+                                                 
+                                                    } )
+                                                  .toList(),
+                                            ],
+                                          );
+                                        },
+                                      ))
+                                    ],
+                                  ),
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                      color: Color(0xffC6C6C6),
+                                      borderRadius: BorderRadius.circular(10)),
+                                )
+                              ],
+                            )),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(
+                      right: 20,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    decoration: BoxDecoration(color: Color(0xffE3E3E3)),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Future<PickedData> pickData() async {
+    LatLong center = LatLong(
+        _mapController.center.latitude, _mapController.center.longitude);
+    var client = http.Client();
+    String url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=${_mapController.center.latitude}&lon=${_mapController.center.longitude}&zoom=18&addressdetails=1';
+
+    var response = await client.get(Uri.parse(url));
+    var decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+    String displayName = decodedResponse['display_name'];
+    return PickedData(center, displayName);
+  }
+}
+
+
+class OSMdata {
+  final String displayname;
+  final double lat;
+  final double lon;
+  OSMdata({required this.displayname, required this.lat, required this.lon});
+  @override
+  String toString()  {
+    return '$displayname, $lat, $lon';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is OSMdata && other.displayname == displayname;
+  }
+
+  @override
+  int get hashCode => Object.hash(displayname, lat, lon);
+}
+
+class LatLong {
+  final double latitude;
+  final double longitude;
+  LatLong(this.latitude, this.longitude);
+}
+
+class PickedData {
+  final LatLong latLong;
+  final String address;
+
+  PickedData(this.latLong, this.address);
+}

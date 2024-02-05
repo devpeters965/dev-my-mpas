@@ -1,0 +1,184 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:real_track/config/theme/style.dart';
+import 'package:real_track/core/constante/constant_var/const_var.dart';
+import 'package:real_track/core/constante/forms/customer_forms.dart';
+import 'package:real_track/feature/auth/domain/usercase/sgin_in.dart';
+import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class UserForm extends StatefulWidget {
+  const UserForm({super.key});
+
+  @override
+  State<UserForm> createState() => _UserFormState();
+}
+
+class _UserFormState extends State<UserForm> {
+
+  bool fomSteppers = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: const EdgeInsets.only(bottom: 13) ,
+      child:Column(
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: SvgPicture.asset("assets/icons/Travelers-pana.svg")),
+          
+              Container(
+                child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                  
+                  fomSteppers 
+                  ?
+                    Column(
+                      children: [
+                        CustomerForm(
+                        label: 'Full name',
+                        textController: fullName,
+                        onChanged: (value) {
+                          name = value;
+                        },
+                        ),
+                        CustomerForm(
+                        label: 'Phone Number',
+                        textController: phoneNumber,
+                        onChanged: (value) {
+                          tell = value;
+                        },
+                        ),
+                      ],
+                    )
+                
+                  :
+                
+                    Column(
+                      children: [
+                        CustomerForm(
+                        label: 'Matricule',
+                        textController: matricule,
+                        onChanged: (value) {
+                          email = value;
+                        },
+
+                        ),
+                        CustomerForm(
+                        label: 'Marque',
+                        textController: marque,
+                        onChanged: (value) {
+                          site = value;
+                        },
+                        ),
+                      ],
+                    ),
+                
+                  ],
+                ),
+              ),
+
+                fomSteppers 
+                ?
+                  GestureDetector(
+                    onTap: () {
+                        setState(() {
+                          fomSteppers = !fomSteppers;
+                          print('-----------------------$fomSteppers');
+                        });
+                    },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(8)
+                      ),
+                      child: const Text(
+                        "next",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 17
+                        ),),
+                      ),
+                    )
+                
+                :
+
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                      GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          fomSteppers =! fomSteppers;
+                        });
+                      },
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle
+                          ),
+                          child: const Icon(CupertinoIcons.back,
+                          color: Colors.white,))
+
+                        //  Container(
+                        // padding: const EdgeInsets.all(5),
+                        // decoration: BoxDecoration(
+                        //   color: Colors.black,
+                        //   borderRadius: BorderRadius.circular(8)
+                        // ),
+                        // child: const Text(
+                        //   "",
+                        //   style: GoogleFonts.poppins(
+                        //     color: Colors.white,
+                        //     fontSize: 17
+                        //   ),),
+                        //  ),
+                      ),
+                                        
+                    GestureDetector(
+                      onTap: ()async{
+                        print("_________________ au cune donneé applode");
+                        await CreatUser.createUser(
+                          flullname: fullName.value.text,
+                          phone: phoneNumber.value.text,
+                          matricule: matricule.value.text,
+                          marque: marque.value.text,
+                          // latitude: position?.altitude ,
+                          // longitude: position?.longitude.,
+                          );                                                   
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> rincipalView()));    
+                          SharedPreferences preferences = await SharedPreferences.getInstance();
+                          preferences.setBool('isValidationDone', true);
+                      },
+                      child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                      color: MyColors.grey,
+                      borderRadius: BorderRadius.circular(8)
+                      ),
+                      child: const Text(
+                      "Validation",
+                      style: GoogleFonts.poppins(
+                        color: Colors.black,
+                        fontSize: 17
+                      ),),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+                ],
+          ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,180 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:real_track/config/route/default_root.dart';
+import 'package:real_track/config/theme/style.dart';
+import 'package:real_track/core/constante/constant_var/const_var.dart';
+import 'package:real_track/core/constante/forms/customer_forms.dart';
+import 'package:real_track/feature/auth/domain/usercase/check_service_map_state.dart';
+import 'package:real_track/feature/auth/domain/usercase/sgin_in.dart';
+import 'package:real_track/feature/auth/presentation/page/princiapl_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class SignUpForm extends StatefulWidget {
+  const SignUpForm({super.key});
+
+  @override
+  State<SignUpForm> createState() => _SignUpFormState();
+}
+
+class _SignUpFormState extends State<SignUpForm> {
+  @override
+  void initState()  {
+     defaultPosition();
+    super.initState();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SvgPicture.asset(
+                "assets/icons/Directions-pana.svg"
+                )
+              ),
+      
+             Expanded(
+              child:  Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                     Text("Get started"),
+                    Text(
+                      // "All people use",
+                      "Use are application\n to see position\n in real time",
+                    style: GoogleFonts.poppins(
+                      color: Colors.black,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold
+                    ),)
+                  ],
+                ),
+              )
+              ),
+      
+              GestureDetector(
+                onTap: (){
+                  showDialog(context: context,
+                   builder: (ctx)=>
+                   Expanded(
+                     child: AlertDialog(
+                      content: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                     const Text("Registre form",
+                     style: GoogleFonts.poppins(
+                      color: Colors.black,
+                      fontSize: 20
+                      ),
+                     ), 
+                      Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                       children: [
+                         CustomerForm(
+                          label: 'Full name',
+                          textController: fullName,
+                          ),
+                         CustomerForm(
+                          label: 'Phone Number',
+                          textController: phoneNumber,
+                          ),
+                         CustomerForm(
+                          label: 'Matricule',
+                          textController: matricule,
+                          ),
+                         CustomerForm(
+                          label: 'Marque',
+                          textController: marque,),
+                          
+                         const Text("Get started"),
+                         const Text(
+                          "Use are application to see position in real time",
+                          textAlign: TextAlign.justify,
+                         
+                          )
+                       ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                           GestureDetector(
+                            onTap: () {
+                              print("_________________ au cune donneé applode");
+                            },
+                             child: Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(8)
+                              ),
+                              child: const Text(
+                                "Annuler",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 17
+                                ),),
+                                                       ),
+                           ),
+                     
+                          GestureDetector(
+                            onTap: ()async{
+                              CreatUser.createUser(
+                                flullname: fullName.value.text,
+                                phone: phoneNumber.value.text,
+                                matricule: matricule.value.text,
+                                marque: marque.value.text,
+                                // latitude: position?.altitude ,
+                                // longitude: position?.longitude.,
+                                );
+
+                                
+                               
+                                SharedPreferences preferences = await SharedPreferences.getInstance();
+                                preferences.setBool('isFirstTime', true);
+                                MyRoot.nextNavigation(context, const PrinciapleView());
+
+
+                            },
+                            child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                            color: MyColors.grey,
+                            borderRadius: BorderRadius.circular(8)
+                            ),
+                            child: const Text(
+                            "Validation",
+                            style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 17
+                            ),),
+                            ),
+                          ),
+                        ],
+                      ),
+                        ],
+                      ),
+                     ),
+                   )
+                   ); 
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCFD8DC),
+                    borderRadius: BorderRadius.circular(8)
+                  ),
+                  child: const Icon(Icons.arrow_forward_ios)
+                ),
+              )
+          ],
+        ),
+      ),
+    );
+  }
+}

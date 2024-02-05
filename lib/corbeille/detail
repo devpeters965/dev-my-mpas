@@ -1,0 +1,161 @@
+    body: Container(
+        margin: const EdgeInsets.all(2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(4)
+                )
+              ),
+              child: 
+              ('${widget.item!['images']}'.isNotEmpty ||widget.search[''] )?
+               Image.network(
+                widget.isSearchToggle?
+                 widget.item!['images'] 
+                 : widget.search!['images'],
+                   height: MediaQuery.sizeOf(context).height/2,)
+            ),
+
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                child:Column(
+                  children: [
+                    ListTile(
+                      title: const Text("You can put your name ", style: GoogleFonts.poppins(color: Colors.black,fontSize: 24),),
+                      subtitle: Row(
+                        children: [
+                         Container(
+                          child:  Row(
+                            children: [
+                              const Icon(Icons.place,color: Colors.red,),
+                              const SizedBox(width: 7),
+                              Text(
+                                widget.isSearchToggle?
+                               widget.item!['communes'] : widget.search!['communes'] ,style: const GoogleFonts.poppins(color: Colors.black)),
+                              const SizedBox(width: 3),
+              
+                               communeAbidjan.contains(
+                              widget.isSearchToggle?  
+                                widget.item!['communes']
+                               : widget.search!['communes']
+                              )
+                              ?  
+                                Text("Communde d'Abidjan",style: GoogleFonts.poppins(color: Colors.black))
+                              : const 
+                               Text("Ville de L'intérieur",style: GoogleFonts.poppins(color: Colors.black))
+                              
+                            ],
+                          ),
+                         )
+                        ],
+                      ),
+                      trailing: Container(
+                         padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[400],
+                          borderRadius: BorderRadius.circular(5)
+                          // shape: BoxShape.circle
+                        ),
+                        child: const Icon(Icons.keyboard_arrow_down_outlined,color: Colors.white,),
+                      )
+                    ),
+              
+                    const SizedBox(height: 10),
+                     Text(detailText,textAlign: TextAlign.justify),
+              
+                     const SizedBox(height: 10),
+              
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Container(
+                                padding:const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black12,
+                                  shape: BoxShape.circle
+                                ),
+                                child: const IconButton(
+                                  onPressed: null, icon: Icon(Icons.phone,color: Colors.brown,)),
+                              ),
+                              const SizedBox(width: 5),
+                     
+                               Text(
+                                
+                                
+                              (  widget.isSearchToggle?
+                                 widget.item!['phone']
+                                 : widget.search!['phone'])
+              
+                                 
+              
+                                 
+                                 ,style: const GoogleFonts.poppins(fontSize: 11),)
+                     
+                            ],
+                          ),
+                        ),
+                     
+                        const SizedBox(width: 7),
+                     
+                         Container(
+                          child: Column(
+                            children: [
+                              Container(
+                                padding:const EdgeInsets.all(1),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black12,
+                                  shape: BoxShape.circle
+                                ),
+                                child: const IconButton(
+                                  onPressed: null, icon: Icon(Icons.email,color: Colors.red,)),
+                              ),
+                              const SizedBox(height: 5),
+                               Text(
+                                widget.isSearchToggle?
+                                 widget.item!['email']
+                                : widget.search!['email'],style: const GoogleFonts.poppins(fontSize: 11),),
+                            ],
+                          ),
+                        ),
+                     
+                        const SizedBox(width: 7),
+                        
+                     
+                         Container(
+                          child: Column(
+                            children: [
+                              Container(
+                                padding:const EdgeInsets.all(1),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black12,
+                                  shape: BoxShape.circle
+                                ),
+                                child: IconButton(
+                                  onPressed: null, icon: Icon(Icons.indeterminate_check_box,color: Colors.blue.shade900,)),
+                              ),
+                              const SizedBox(width: 5),
+                              const Text("+Momo paris",style: GoogleFonts.poppins(fontSize:11),)
+                     
+                            ],
+                          ),
+                        )
+                                     
+                      ],
+                     )
+                  ],
+                )
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }   

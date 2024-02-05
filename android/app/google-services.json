@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "974168670209",
+    "project_id": "real-traking",
+    "storage_bucket": "real-traking.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974168670209:android:f362f20065224d8ca4c000",
+        "android_client_info": {
+          "package_name": "com.example.real_track"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYO0dvqtH0PVRFGxX4wwvIFd7kSJAcYCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
