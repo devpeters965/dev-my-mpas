@@ -8,6 +8,9 @@ class AssetsFile{
   static const deletedJson = '$baseIcons/deleted.json';
   static const validerJson = '$baseIcons/valider.json';
   static const emptyJson = '$baseIcons/empty.json';
+  static const emptyImage1 = '$baseIcons/emtyImage1.json';
+    static const emptyImage = '$baseIcons/emtyImage.json';
+
   
 
 

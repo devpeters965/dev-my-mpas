@@ -11,6 +11,7 @@ import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
 import 'package:real_track/feature/auth/presentation/widget/form/bloc/bloc_sign_in/auth%20_state.dart';
 import 'package:real_track/feature/auth/presentation/widget/form/bloc/bloc_sign_in/auth_bloc.dart';
 import 'package:real_track/feature/auth/presentation/widget/form/bloc/bloc_sign_in/auth_event.dart';
+import 'package:real_track/feature/auth/presentation/widget/form/connection/sign_ins.dart';
 
 class SignIn extends StatefulWidget {
   
@@ -76,7 +77,7 @@ class _SignInState extends State<SignIn> {
                 },
                 builder: (context, state) {
                   return Align(
-                    alignment: Alignment.center,
+                    alignment: Alignment.bottomRight,
                     child: GestureDetector(
                       onTap: () {
                            BlocProvider.of<AuthenticationBloc>(context).add(
@@ -100,11 +101,12 @@ class _SignInState extends State<SignIn> {
                         ),
                   );
                     },
-                 ),
-                        
-                        
-          
-                      )           
+                 ), 
+                      ),
+
+                      const SizedBox(height: 6),
+                      const GoogleSignInScreen()
+
                     ],
                   ),
                 ),

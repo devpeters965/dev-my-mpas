@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/feature/auth/presentation/page/my_profile.dart';
 import 'package:real_track/feature/auth/presentation/widget/form/profile/isfirst_connexion.dart';
@@ -15,6 +16,7 @@ class ProfileViewFlow extends StatefulWidget {
 
 class _ProfileViewFlowState extends State<ProfileViewFlow> {
   bool isFirstTime = true;
+  bool rowBackEditProfile = false;
 
 @override
   void initState() {
@@ -43,14 +45,14 @@ class _ProfileViewFlowState extends State<ProfileViewFlow> {
         }
         else{
              print("============= take to regitrer logine");
-             AutomateNavigator.getScreen(2,context,   CreateLocalCompte());
+             AutomateNavigator.getScreen(2,context,   const CreateLocalCompte(rowBackEditProfile: false,));
         }
         return Container(
           height: size.height,
           width: size.width,
           color: Colors.white,
           alignment: Alignment.center,
-          child: SvgPicture.asset("assets/icons/Directions-bro.svg"),
+          child: SvgPicture.asset(AssetsFile.groupSvg),
         
         );
     

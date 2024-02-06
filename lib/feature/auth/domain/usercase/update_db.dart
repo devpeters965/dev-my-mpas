@@ -40,8 +40,11 @@ class AddUser{
       
      String imageUri = await uploadeImageToDataBase("children", images);
 
-     // ------------------ Add Data In FB 
-    await  FirebaseFirestore.instance.collection('Userinfo').add({
+     final querySnapshort = await FirebaseFirestore.instance.collection('Userinfo').where('managerNames', isEqualTo:managerNames).get();
+      querySnapshort.docs.forEach((DocumentSnapshot documentSnapshot) {
+
+      // ------------------ Add Data In FB 
+      FirebaseFirestore.instance.collection('Userinfo').doc(documentSnapshot.id).update({
       'images':imageUri,
       'managerNames':managerNames,
       'bussinessNames':bussinessNames,
@@ -53,6 +56,12 @@ class AddUser{
       'description':desciption
   
     });
+        
+      });
+
+
+
+  
     print('==== User created  lalt ${position.altitude} long ${position.longitude}');  
 
     return '';
@@ -60,7 +69,7 @@ class AddUser{
   }
 
   // -------------------- Upload Data Into FB
-  void upLoadData(Uint8List image)async{
+    upLoadData(Uint8List image)async{
     final uploadFileTime = DateTime.now();
     String body = await AddUser().addUsers(
                     managerNames: managerName.text,
@@ -73,7 +82,7 @@ class AddUser{
                     desciption: desciption.text 
                     );
       debugPrint('-------------------- UpLoad Data Into FB ');
-      debugPrint('------------------- body : $body');              
+      debugPrint('------------------- Update body : $body');              
 
   }
 }

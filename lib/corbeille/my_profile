@@ -24,9 +24,9 @@ import 'package:real_track/feature/auth/presentation/widget/form/profile/isfirst
 
 
 class MyProfile extends StatefulWidget {
-   MyProfile({super.key, this.userModel,});
+   MyProfile({super.key, this.userModel, this.isa});
   final UserModel? userModel;
-  // final Isar? isa ;
+  final Isar? isa ;
   
 
   @override
@@ -36,7 +36,6 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
 
   final listentAllNote = LocatData().allEdit();
-  late bool rowBackEditProfile = true;
 
   final bool passeOfMyprofile = true;
   late bool showImage = false;
@@ -64,27 +63,70 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
+  final newLocalDB = LocatData();
+  late  UserModel   userEditing = UserModel(
+  id: Isar.autoIncrement,
+   managerNames: managerName.text,
+   bussiness: bussinessName.text,
+   phoneName: phoneNumber.text,
+   email: mysemail.text,
+   desciption: desciption.text,
+   commune: userCommune as String, images: '$_imgesProile' );
 
+  // final mysemail = TextEditingController();
+  // final desciption = TextEditingController();
 
-  late  UserModel userItem;
 
    @override
   void initState() {
     super.initState();
  if (widget.userModel != null) {
-    
+      // mysemail.text = widget.userModel!.email;
+      // desciption.text = widget.userModel!.desciption;
     }
   }
 
+
+
+  @override
+  void dispose() async{
+    super.dispose();
+    log(mysemail.text);
+    log(desciption.text);
+
+    if(widget.userModel != null){
+      userEditing = widget.userModel!.copyWith(
+      managerNames: managerName.text,
+      bussiness: bussinessName.text,
+      phoneName: phoneNumber.text,
+      email: mysemail.text,
+      desciption: desciption.text,
+      commune: userCommune as String,
+      image: '$_imgesProile'
+     );
+     newLocalDB.saveData(editProfile: userEditing);
+     return;
+    }
+    
+
+    // newLocalDB.saveData(editProfile: userEditing);
+    // managerName.dispose();
+    // bussinessName.dispose();
+    // phoneNumber.dispose();
+    // // mysemail.dispose();
+    // mysemail.dispose();
+    // desciption.dispose();
+
+    // log('-----insert this data in Local Db    ${newLocalDB.saveData(editProfile: userEditing)}');
+  }
+
+  
 
 
 
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
       drawer: const UserMenu(),
       appBar: AppBar(
@@ -100,10 +142,8 @@ class _MyProfileState extends State<MyProfile> {
               //  widget.passeOfMyprofile = true;
              });
             Navigator.push(context, MaterialPageRoute(builder: ((context) => 
-             CreateLocalCompte(
-              rowBackEditProfile: true,
-              userModel: userItem,
-              )
+            CreateLocalCompte(
+              passeOfMyprofile: passeOfMyprofile)
             )));
           },
            child: Container(
@@ -127,7 +167,6 @@ class _MyProfileState extends State<MyProfile> {
                 height: MediaQuery.sizeOf(context).height,
                  child: StreamBuilder<List<UserModel>?>(
                    stream: LocatData().allEdit(),
-                  // stream: LocatData().fectAllNote(),
                     builder: (context , snapshort){
                      if(snapshort.connectionState == ConnectionState.waiting){
                        print("-------- data isSvace into local db ");
@@ -163,7 +202,7 @@ class _MyProfileState extends State<MyProfile> {
                      return ListView.builder(
                        itemCount: userInfo!.length,
                        itemBuilder: (context, index){
-                          userItem = userInfo[index];
+                         final userItem = userInfo[index];
                          print('-------------my image ${userItem.images}');
                          
                  
@@ -650,13 +689,105 @@ class _MyProfileState extends State<MyProfile> {
       floatingActionButton:  FloatingActionButton(
         backgroundColor: MyColors.greens,
         onPressed: (){
+          if(_imgesProile.isNotEmpty){
+               showDialog(context: context, builder: ((context) => 
+                  AlertDialog(
+                    title: Text("Enregister votre modification.",
+                    style: GoogleFonts.poppins(
+                      fontSize: 19
+                    ),),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Lottie.asset(AssetsFile.validerJson),
+                        Text("Assurez vous de changer l'image?",
+                          style: GoogleFonts.poppins(
+                            fontSize: 18
+                    ),),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: (){
+                          // CreatUser().upLoadData(_image!);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Proceed")
+                        ),
 
-          Future.delayed(Duration(seconds: 1)).then((value) {
-          
+                      TextButton(
+                        onPressed: (){
+
+                          // --------------- Update User in LDB
+                         
+                          // ---------------- Update User in FB
+                          AddUser().upLoadData(_image!);
+                          debugPrint('------ Remote DB:  ${AddUser().upLoadData(_image!)}');
+                          
+
+                          debugPrint('update body: ${AddUser().upLoadData(_image!)}');
                           Navigator.push(context, MaterialPageRoute(builder: ((context) => 
                            rincipalView()
                           )));
-          });
+                        
+                        },
+                        child:  Text("Yes")
+                        )  
+                    ],
+                  )
+
+                  )
+                  );
+                }
+          if(_imgesProile.isEmpty){
+                    print('------------- update Local data');
+               showDialog(context: context, builder: ((context) => 
+                               AlertDialog(
+                                 title: Text("Ajouter une Image avant de valider ",
+                                 style: GoogleFonts.poppins(
+                                   fontSize: 19
+                                 ),),
+                                 content: Column(
+                                   mainAxisSize: MainAxisSize.min,
+                                   children: [
+                                    Lottie.asset(AssetsFile.emptyImage1),
+                                   
+                                     SizedBox(height: 4.h),
+                                //      Text("Avez vous selectionner une image ? ",
+                                //        style: GoogleFonts.poppins(
+                                //          fontSize: 18
+                                //  ),),
+                                   ],
+                                 ),
+                                 actions: [
+                                  //  TextButton(
+                                  //    onPressed: (){
+                                  //     setState(() {
+                                  //       setState(() {
+                                  //        Navigator.of(context).pop();
+                                  //      });
+                                        
+                                  //     });
+                                  //    },
+                                  //    child: const Text("Proceed")
+                                  //    ),
+                           
+                                   TextButton(
+                                     onPressed: (){
+                                       setState(() {
+                                         Navigator.of(context).pop();
+                                       });
+                                     },
+                                     child: const Text("Yes")
+                                     )  
+                                 ],
+                               )
+                           
+                               )
+                               );     
+          }
+          
+
 
         },
         child: const Icon(CupertinoIcons.house,color: Colors.white,)
