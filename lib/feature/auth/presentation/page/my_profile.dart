@@ -2,6 +2,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,14 +19,18 @@ import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart
 import 'package:real_track/feature/auth/data/model/user_info.dart';
 import 'package:isar/isar.dart';
 import 'package:real_track/feature/auth/domain/usercase/update_db.dart';
+import 'package:real_track/feature/auth/domain/usercase/usercase.dart';
+import 'package:real_track/feature/auth/presentation/page/empty_data.dart';
 import 'package:real_track/feature/auth/presentation/page/menu.dart';
 import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
 import 'package:real_track/feature/auth/presentation/widget/form/profile/isfirst_connexion.dart';
 
 
 class MyProfile extends StatefulWidget {
-   MyProfile({super.key, this.userModel,});
+   MyProfile({super.key, this.userModel});
   final UserModel? userModel;
+ 
+
   // final Isar? isa ;
   
 
@@ -67,23 +72,38 @@ class _MyProfileState extends State<MyProfile> {
 
 
   late  UserModel userItem;
-
-   @override
-  void initState() {
-    super.initState();
- if (widget.userModel != null) {
-    
-    }
+  
+ @override
+  void dispose() {
+    log('<<-----Data Body:[$userItem]');
+    super.dispose();
   }
 
+     void seachStudio(String query)async{
+      final resultat = await FirebaseFirestore.instance.collection('Userinfo').where("communes", isEqualTo: query).get();
+       searcResulat = await  resultat.docs.map((e)  =>e.data()).toList();
+      setState(()  {
+          if(searcResulat.isNotEmpty){
+              setState(()  {
+                 toogleSearchBar =  true;
+                 isSearchInformation = false;
+              });
+              print('------------------- isSearch: $toogleSearchBar');
+          } 
+          if(searcResulat.isEmpty){
+            const Text("aucune valeur");
+          } 
+          print(searcResulat);
+      }); 
+      // return seachStudio(query);
+    }
+  
 
 
 
 
   @override
   Widget build(BuildContext context) {
-
-
 
     return Scaffold(
       drawer: const UserMenu(),
@@ -97,14 +117,13 @@ class _MyProfileState extends State<MyProfile> {
          GestureDetector(
           onTap: () {
              setState(() {
-              //  widget.passeOfMyprofile = true;
              });
-            Navigator.push(context, MaterialPageRoute(builder: ((context) => 
-             CreateLocalCompte(
-              rowBackEditProfile: true,
-              userModel: userItem,
-              )
-            )));
+              Navigator.push(context, MaterialPageRoute(builder: ((context) => 
+              CreateLocalCompte(
+                rowBackEditProfile: true,
+                userModel: userItem,
+                )
+              )));
           },
            child: Container(
             padding: EdgeInsets.all(2.h),
@@ -126,7 +145,8 @@ class _MyProfileState extends State<MyProfile> {
                SizedBox(
                 height: MediaQuery.sizeOf(context).height,
                  child: StreamBuilder<List<UserModel>?>(
-                   stream: LocatData().allEdit(),
+                  stream:  UserCase.usercase.getUserInfo(),
+                  //  stream:  LocatData().allEdit(),
                   // stream: LocatData().fectAllNote(),
                     builder: (context , snapshort){
                      if(snapshort.connectionState == ConnectionState.waiting){
@@ -197,78 +217,36 @@ class _MyProfileState extends State<MyProfile> {
                                         child: SvgPicture.asset("assets/icons/Online world-cuate.svg"),
                                       ),
           
-                                    Positioned(
-                                      bottom: 9.h,
-                                      right: 10.h,
-                                      // left: 10.h,
-                                      child: Align(
-                                        alignment: const Alignment(0.3, 0.5 ),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: MyColors.greens,
-                                            shape: BoxShape.circle
-                                          ),
-                                          child: IconButton(
-                                                  onPressed: (){
-                                                    selectImages();
-                                                  }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
-                                        ),),
-                                    )
+                                    // Positioned(
+                                    //   bottom: 9.h,
+                                    //   right: 10.h,
+                                    //   // left: 10.h,
+                                    //   child: Align(
+                                    //     alignment: const Alignment(0.3, 0.5 ),
+                                    //     child: Container(
+                                    //       decoration: BoxDecoration(
+                                    //         color: MyColors.greens,
+                                    //         shape: BoxShape.circle
+                                    //       ),
+                                    //       child: IconButton(
+                                    //               onPressed: (){
+                                    //                 selectImages();
+                                    //               }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
+                                    //     ),),
+                                    // )
                                     ]
                                   )
                                 ),
           
                          GestureDetector(
-                           onTap: () {
-                              showDialog(context: context, builder: ((context) => 
-                               AlertDialog(
-                                 title: Text("Ajouter le Manager name ",
-                                 style: GoogleFonts.poppins(
-                                   fontSize: 19
-                                 ),),
-                                 content: Column(
-                                   mainAxisSize: MainAxisSize.min,
-                                   children: [
-                                     CustomerForm(
-                                       label: 'Manager name',
-                                       textController: managerName,
-                                     ),
-                                     SizedBox(height: 4.h),
-                                     Text("Voullez vous apporter des modification ? ",
-                                       style: GoogleFonts.poppins(
-                                         fontSize: 18
-                                 ),),
-                                   ],
-                                 ),
-                                 actions: [
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.pop(context);
-                                       // Navigator.pop(context);
-                                     },
-                                     child: const Text("Proceed")
-                                     ),
-                           
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.of(context).pop();
-                                     },
-                                     child: const Text("Yes")
-                                     )  
-                                 ],
-                               )
-                           
-                               )
-                               );     
-                  
-                           },
                            child: Container(
                              margin: EdgeInsets.only(left: 5.sp),
                              child: Align(
                                alignment: Alignment.topLeft,
                                child: Text(
-                                userItem.managerNames,
-                               
+                                 userItem.managerNames.isNotEmpty?
+                                 userItem.managerNames
+                                : "Info non valide",
                                  style: GoogleFonts.poppins(fontSize: 20.sp)
                                  ),
                              ),
@@ -279,55 +257,15 @@ class _MyProfileState extends State<MyProfile> {
                  
                          SizedBox(
                            child: GestureDetector(
-                            onTap: () {
-                                showDialog(context: context, builder: ((context) => 
-                               AlertDialog(
-                                 title: Text("Ajouter le Business Name ",
-                                 style: GoogleFonts.poppins(
-                                   fontSize: 19
-                                 ),),
-                                 content: Column(
-                                   mainAxisSize: MainAxisSize.min,
-                                   children: [
-                                     CustomerForm(
-                                       label: 'Business name',
-                                       textController: bussinessName,
-                                     ),
-                                     SizedBox(height: 4.h),
-                                     Text("Voullez vous apporter des modification ? ",
-                                       style: GoogleFonts.poppins(
-                                         fontSize: 18
-                                 ),),
-                                   ],
-                                 ),
-                                 actions: [
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.pop(context);
-                                       // Navigator.pop(context);
-                                     },
-                                     child: const Text("Proceed")
-                                     ),
-                           
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.of(context).pop();
-                                     },
-                                     child: const Text("Yes")
-                                     )  
-                                 ],
-                               )
-                           
-                               )
-                               ); 
-                              
-                            },
                              child: Container(
                                margin: EdgeInsets.only(left: 5.sp),
                                child: Align(
                                  alignment: Alignment.topLeft,
-                                 child: Text(userItem.bussiness,
-                                
+                                 child: Text(
+                                  userItem.bussiness.isNotEmpty?
+                                   userItem.bussiness
+                                  : "Aucune Activé",
+
                                    style: GoogleFonts.poppins(fontSize: 20.sp)
                                    ),
                                ),
@@ -339,50 +277,7 @@ class _MyProfileState extends State<MyProfile> {
                            Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                      GestureDetector(
-                           onTap: () {
-                              showDialog(context: context, builder: ((context) => 
-                               AlertDialog(
-                                 title: Text("Ajouter un contact ",
-                                 style: GoogleFonts.poppins(
-                                   fontSize: 19
-                                 ),),
-                                 content: Column(
-                                   mainAxisSize: MainAxisSize.min,
-                                   children: [
-                                     CustomerForm(
-                                       label: 'Contact',
-                                       textController: phoneNumber,
-                                     ),
-                                     SizedBox(height: 4.h),
-                                     Text("Voullez vous apporter des modification ? ",
-                                       style: GoogleFonts.poppins(
-                                         fontSize: 18
-                                 ),),
-                                   ],
-                                 ),
-                                 actions: [
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.pop(context);
-                                       // Navigator.pop(context);
-                                     },
-                                     child: const Text("Proceed")
-                                     ),
-                           
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.of(context).pop();
-                                     },
-                                     child: const Text("Yes")
-                                     )  
-                                 ],
-                               )
-                           
-                               )
-                               );
-                           },
-                           
+                      GestureDetector(                           
                            child: Container(
                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
                              child: Column(
@@ -398,7 +293,10 @@ class _MyProfileState extends State<MyProfile> {
                                SizedBox(
                                  height: 5.h,
                                ),
-                               Text(userItem.phoneName,
+                               Text(userItem.phoneName.isNotEmpty?
+                                userItem.phoneName
+                               : 'numéro invalide'
+                               ,
                                style: GoogleFonts.poppins(
                                  fontSize: 11.sp
                                ),)
@@ -408,48 +306,6 @@ class _MyProfileState extends State<MyProfile> {
                          ),
                            
                           GestureDetector(
-                           onTap: () {
-                              showDialog(context: context, builder: ((context) => 
-                               AlertDialog(
-                                 title: Text("Ajouter un nouveau mail ",
-                                 style: GoogleFonts.poppins(
-                                   fontSize: 19
-                                 ),),
-                                 content: Column(
-                                   mainAxisSize: MainAxisSize.min,
-                                   children: [
-                                      CustomerForm(
-                                       label: 'Email',
-                                       textController: mysemail,
-                                       ),
-                                     Text("Voullez vous apporter des modification ?",
-                                       style: GoogleFonts.poppins(
-                                         fontSize: 18
-                                 ),),
-                                   ],
-                                 ),
-                                 actions: [
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.pop(context);
-                                       // Navigator.pop(context);
-                                     },
-                                     child: const Text("Proceed")
-                                     ),
-                           
-                                   TextButton(
-                                     onPressed: (){
-                                       Navigator.of(context).pop();
-                                     },
-                                     child: const Text("Yes")
-                                     )  
-                                 ],
-                               )
-                           
-                               )
-                               );
-                             },
-                           
                            child: Container(
                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
                              child: Column(
@@ -465,7 +321,10 @@ class _MyProfileState extends State<MyProfile> {
                                SizedBox(
                                  height: 5.h,
                                ),
-                               Text(userItem.email,
+                               Text(userItem.email.isNotEmpty?
+                                userItem.email
+                               : 'adresse email invalide'
+                               ,
                                style: GoogleFonts.poppins(
                                  fontSize: 11.sp
                                ),)
@@ -476,55 +335,6 @@ class _MyProfileState extends State<MyProfile> {
                            
                            
                           GestureDetector(
-                           onTap: () { 
-                            showDialog(context: context, builder: ((context) => 
-                             AlertDialog(
-                               title: Text("Selectioner un Commune",
-                               style: GoogleFonts.poppins(
-                                 fontSize: 19
-                               ),),
-                               content: Column(
-                                 mainAxisSize: MainAxisSize.min,
-                                 children: [
-                                   
-                                     CustomerSelected(
-                                     label: '',
-                                     inputTitle: "Abidjan", items: communeAbidjan,
-                                     onChanged: (value) {
-                                       setState(() {
-                                         userCommune = value;
-                                         print("___________ ${userCommune}");
-                                       });
-                                     },
-                                     ),
-                                   Text("Voullez vous apporter des modification ?",
-                                     style: GoogleFonts.poppins(
-                                       fontSize: 18
-                               ),),
-                                 ],
-                               ),
-                               actions: [
-                                 TextButton(
-                                   onPressed: (){
-                                     Navigator.pop(context);
-                                     // Navigator.pop(context);
-                                   },
-                                   child: const Text("Proceed")
-                                   ),
-                           
-                                 TextButton(
-                                   onPressed: (){
-                                     Navigator.of(context).pop();
-                                   },
-                                   child: const Text("Yes")
-                                   )  
-                               ],
-                             )
-                           
-                             )
-                             );
-                           },
-                           
                            child: Container(
                              margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
                              child: Column(
@@ -540,7 +350,10 @@ class _MyProfileState extends State<MyProfile> {
                                SizedBox(
                                  height: 5.h,
                                ),
-                               Text(userItem.commune,
+                               Text(userItem.commune.isNotEmpty?
+                                 userItem.commune
+                               : 'aucune commune',
+                                
                                style: GoogleFonts.poppins(
                                  fontSize: 11.sp
                                ),)
@@ -553,54 +366,6 @@ class _MyProfileState extends State<MyProfile> {
                  ),
                  
                  GestureDetector(
-                   onTap: () {
-                          showDialog(context: context, builder: ((context) => 
-                               AlertDialog(
-                                 title: Text("Ajouter une description ",
-                                 style: GoogleFonts.poppins(
-                                   fontSize: 19
-                                 ),),
-                                 content: Column(
-                                   mainAxisSize: MainAxisSize.min,
-                                   children: [
-                                     CustomerForm(
-                                       label: 'description',
-                                       textController: desciption,
-                                     ),
-                                     SizedBox(height: 4.h),
-                                     Text("Voullez vous apporter des modification ? ",
-                                       style: GoogleFonts.poppins(
-                                         fontSize: 18
-                                 ),),
-                                   ],
-                                 ),
-                                 actions: [
-                                   TextButton(
-                                     onPressed: (){
-                                      setState(() {
-                                        setState(() {
-                                         Navigator.of(context).pop();
-                                       });
-                                        
-                                      });
-                                     },
-                                     child: const Text("Proceed")
-                                     ),
-                           
-                                   TextButton(
-                                     onPressed: (){
-                                       setState(() {
-                                         Navigator.of(context).pop();
-                                       });
-                                     },
-                                     child: const Text("Yes")
-                                     )  
-                                 ],
-                               )
-                           
-                               )
-                               );     
-                   },
                    child: Text('description',
                    style: GoogleFonts.poppins(fontSize: 23.sp)
                  ),),
@@ -609,7 +374,9 @@ class _MyProfileState extends State<MyProfile> {
                  SizedBox(
                     height: 14.h,
                    ),
-                 Container(
+                   
+                   userItem.desciption.isNotEmpty?
+                     Container(
                    padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
                    child: Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -617,14 +384,14 @@ class _MyProfileState extends State<MyProfile> {
                         SizedBox(
                            width: MediaQuery.sizeOf(context).width/2,
                            child:  Text(
-                             userItem.desciption,
+                             userItem.desciption
+                             ,
                              style: GoogleFonts.poppins(
                                fontSize: 16.sp
                              ),
                                textAlign: TextAlign.start,
                                )
                          ),
-                      
                        Expanded(
                          child: SvgPicture.asset(AssetsFile.socialMediasvg,
                          width: MediaQuery.sizeOf(context).width/2,
@@ -633,7 +400,7 @@ class _MyProfileState extends State<MyProfile> {
                      ],
                    ),
                  )
-                              
+                   : const EmptyView()         
                        ],
                      );
                  
@@ -650,19 +417,14 @@ class _MyProfileState extends State<MyProfile> {
       floatingActionButton:  FloatingActionButton(
         backgroundColor: MyColors.greens,
         onPressed: (){
-
           Future.delayed(Duration(seconds: 1)).then((value) {
-          
-                          Navigator.push(context, MaterialPageRoute(builder: ((context) => 
-                           rincipalView()
-                          )));
-          });
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => 
+                    rincipalView()
+                  )));
+        });
 
         },
         child: const Icon(CupertinoIcons.house,color: Colors.white,)
-        // Text(
-        //   "Modifier",
-        //   style: GoogleFonts.poppins(color: MyColors.black, fontSize: 10.sp)),
         )
     );
   }

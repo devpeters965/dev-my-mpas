@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,17 +14,19 @@ import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
 import 'package:real_track/core/constante/forms/customer_forms.dart';
 import 'package:real_track/core/constante/forms/customer_selected.dart';
+import 'package:real_track/core/customer_widget/form_pop.dart';
 import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart';
 import 'package:real_track/feature/auth/data/model/user_info.dart';
 import 'package:real_track/feature/auth/domain/usercase/add_db.dart';
+import 'package:real_track/feature/auth/domain/usercase/update_db.dart';
 import 'package:real_track/feature/auth/presentation/page/menu.dart';
 import 'package:real_track/feature/auth/presentation/page/my_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateLocalCompte extends StatefulWidget {
-  const CreateLocalCompte({super.key, this.userModel,  this.passeOfMyprofile, this.listentAllNote, this.isar });
+  const CreateLocalCompte({super.key, this.userModel,  this.listentAllNote, required this.rowBackEditProfile, this.isar, });
   final UserModel? userModel;
-  final bool? passeOfMyprofile;
+  final bool rowBackEditProfile;
   final LocatData? listentAllNote;
   final Isar? isar;
 
@@ -34,9 +35,9 @@ class CreateLocalCompte extends StatefulWidget {
 }
 
 class _CreateLocalCompteState extends State<CreateLocalCompte> {
-
+  late bool isSelectImage = true;
   late bool showImage = false;
-  late Uint8List? _image ;
+  late Uint8List? _image  ;
   late String _imgesProile = "";
   void selectImages() async{
     XFile? _img = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -73,29 +74,31 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
    email: mysemail.text,
    desciption: desciption.text,
    commune: userCommune as String,
-   images: '$_imgesProile' );
+   images:  '$_imgesProile' );
   final emailControler = TextEditingController();
 
      
 
-  late Isar isar;
+  // late Isar isar;
   String informaton = "Creer";
-
-
    @override
   void initState() {
     super.initState();
-    isar = widget.isar!;
+    // isar = widget.isar!;
  if (widget.userModel != null) {
       informaton = 'Modifier';
-      emailControler.text = widget.userModel!.email;
+      managerName.text = widget.userModel!.managerNames;
+      bussinessName.text = widget.userModel!.bussiness;
+      phoneNumber.text = widget.userModel!.phoneName;
+      mysemail.text = widget.userModel!.email;
       desciption.text = widget.userModel!.desciption;
+      userCommune = widget.userModel!.commune;
+      _imgesProile = widget.userModel!.images;
     }
 
     // newLocalDB.saveData(editProfile: userEditing);
+   
   }
-
-
 
   @override
   void dispose() async{
@@ -103,9 +106,8 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
     log(mysemail.text);
     log(desciption.text);
     
-
     if(widget.userModel != null){
-     final userEditing = widget.userModel!.copyWith(
+      final userEditing = widget.userModel!.copyWith(
       managerNames: managerName.text,
       bussiness: bussinessName.text,
       phoneName: phoneNumber.text,
@@ -114,12 +116,11 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
       commune: userCommune as String,
       image: '$_imgesProile'
      );
-     newLocalDB.saveData(editProfile: userEditing);
+    //  newLocalDB.saveData(editProfile: userEditing);
      
      return;
     }
     
-
     // newLocalDB.saveData(editProfile: userEditing);
     managerName.dispose();
     bussinessName.dispose();
@@ -127,24 +128,18 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
     mysemail.dispose();
     // emailControler.dispose();
     desciption.dispose();
-
-    // log('${newLocalDB.saveData(editProfile: userEditing)}');
   }
-
+   
 
   @override
   Widget build(BuildContext context) {
-
-  
-    
-
-
+   
     return  Scaffold(
       drawer:  UserMenu(),
       appBar: AppBar(
-        automaticallyImplyLeading: widget.passeOfMyprofile!? true : false ,
+        // automaticallyImplyLeading:   widget.rowBackEditProfile,
         backgroundColor: Colors.black,
-        leading: GestureDetector(
+        leading: widget.rowBackEditProfile == true ? GestureDetector(
           onTap: () {
             Navigator.push(
               context, 
@@ -156,7 +151,8 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
             // Navigator.pop(context);
           },
           child: const Icon(CupertinoIcons.back,color: Colors.white,),
-        ),
+        )
+        :Container()
       ),
       body: SafeArea(
         child: Column(
@@ -209,22 +205,19 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                SizedBox(
                  height: 9.h,
                 ),
-        
                            Expanded(
                              child: SingleChildScrollView(
                                child: Column(
                                 children: [
                                      GestureDetector(
                                     onTap: () {
-                                         showDialog(
-                                            context: context, builder: ((context) => 
-                                        AlertDialog(
-                                          title: Text("Ajouter le Manager name ",
+                                       CustomerWidgets.popForm(
+                                        context,
+                                        Text("Ajouter le Manager name ",
                                           style: GoogleFonts.poppins(
                                             fontSize: 19
-                                          ),),
-                                          content: SingleChildScrollView(
-                                            child: Column(
+                                          )),
+                                          Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 CustomerForm(
@@ -238,8 +231,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                             ),),
                                               ],
                                             ),
-                                          ),
-                                          actions: [
+                                            [
                                             TextButton(
                                               onPressed: (){
                                                 Navigator.pop(context);
@@ -258,11 +250,59 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                               },
                                               child: const Text("Yes")
                                               )  
-                                          ],
-                                        )
+
+                                            ]
+                                        );
+
+
+
+                                    //  showDialog(
+                                    //         context: context, builder: ((context) => 
+                                    //     AlertDialog(
+                                    //       title: Text("Ajouter le Manager name ",
+                                    //       style: GoogleFonts.poppins(
+                                    //         fontSize: 19
+                                    //       ),),
+                                    //       content: SingleChildScrollView(
+                                    //         child: Column(
+                                    //           mainAxisSize: MainAxisSize.min,
+                                    //           children: [
+                                    //             CustomerForm(
+                                    //               label: 'Manager name',
+                                    //               textController: managerName,
+                                    //             ),
+                                    //             SizedBox(height: 4.h),
+                                    //             Text("Voullez vous apporter des modification ? ",
+                                    //               style: GoogleFonts.poppins(
+                                    //                 fontSize: 18
+                                    //         ),),
+                                    //           ],
+                                    //         ),
+                                    //       ),
+                                    //       actions: [
+                                    //         TextButton(
+                                    //           onPressed: (){
+                                    //             Navigator.pop(context);
+                                    //             managerName.clear();
+                                    //           },
+                                    //           child: const Text("Proceed")
+                                    //           ),
                                     
-                                        )
-                                        );     
+                                    //         TextButton(
+                                    //           onPressed: (){
+                                    //             // Navigator.of(context).pop();
+                                    //             setState(() {
+                                    //               Navigator.of(context).pop();
+                                                  
+                                    //             });
+                                    //           },
+                                    //           child: const Text("Yes")
+                                    //           )  
+                                    //       ],
+                                    //     )
+                                    
+                                    //     )
+                                    //     );     
                                                         
                                     },
                                     child: Container(
@@ -580,12 +620,11 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                     ),
                                     ),
                                   )
-                                                         
-                                                         ],
+                                     ],
                                                        ),
                                                        
-                                                       GestureDetector(
-                                                         onTap: () {
+                                GestureDetector(
+                                  onTap: () {
                                    showDialog(context: context, builder: ((context) => 
                                         AlertDialog(
                                           title: Text("Ajouter une description ",
@@ -633,20 +672,20 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                     
                                         )
                                         );     
-                                                         },
-                                                         child: Text("Description",
-                                                         style: GoogleFonts.poppins(fontSize: 23.sp)
-                                                       ),),
-                                                       
-                                                       
-                                                       SizedBox(
-                                                          height: 14.h,
-                                                         ),
-                                                       Container(
-                                                         padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
-                                                         child: Row(
-                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                           children: [
+                              },
+                              child: Text("Description",
+                              style: GoogleFonts.poppins(fontSize: 23.sp)
+                            ),),
+                            
+                            
+                            SizedBox(
+                              height: 14.h,
+                              ),
+                            Container(
+                              padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
                                  SizedBox(
                                     width: MediaQuery.sizeOf(context).width/2,
                                     child:  Text(
@@ -690,8 +729,19 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       // LottieBuilder.asset(AssetsFile.deletedJson),
-                                      Lottie.asset(AssetsFile.validerJson),
-                                      Text("Assurer vous d'ajouter une image ?",
+                                      isSelectImage == true?
+                                      Lottie.asset(AssetsFile.emptyImage1)
+                                     : Lottie.asset(AssetsFile.validerJson),
+                                     
+                                     isSelectImage == true?
+                                      Text(
+                                        "Oooohs Ajouter une images !",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18
+                                       ),)
+                                    :
+                                      Text(
+                                        "Assurer vous d'ajouter une image ?",
                                         style: GoogleFonts.poppins(
                                           fontSize: 18
                                   ),),
@@ -700,36 +750,83 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                   actions: [
                                     TextButton(
                                       onPressed: (){
-                                        Navigator.pop(context);                                        
+                                        Navigator.pop(context);    
+                                        setState(() {
+                                             isSelectImage = false;
+                                          });
+                          
                                       },
                                       child: const Text("Proceed")
                                       ),
-                  
-                                    TextButton(
+                                      
+                                     isSelectImage == true?
+                                      TextButton(
+                                        onPressed: ()async{
+                                          setState(() {
+                                             isSelectImage = false;
+                                          });
+                                            
+                                        if(informaton == "Creer"){
+
+                                           Navigator.of(context).pop();
+                                        }
+
+                                        // ------------- Update User information Local DB an FB
+                                        if(informaton == "Modifier"){
+                                        
+                                            Navigator.of(context).pop();
+                                     
+                                        }
+                                        }, child: Text("Ok"))
+                                    :  
+                                       TextButton(
                                       onPressed: ()async{
-                                            // --------------- Create User information in FB
-                                            CreatUser().upLoadData(_image!);
+
+                                         // ------------- Create User information Local DB an FB
+
+                                        if(informaton == "Creer"){
 
                                             debugPrint('<<------------ create local User now -------------->  ');
-                                               Navigator.push(context, MaterialPageRoute(builder: ((context) => 
-                                                MyProfile())));
+                                                        // ------ Create local Db
+                                                newLocalDB.saveData(editProfile: userEditing);
+                                                      // ------ Create local Db 
+                                                 CreatUser().upLoadData(_image!);
+                                                    // ------ Share reference 
+                                                 SharedPreferences preferences = await  SharedPreferences.getInstance();
+                                                 preferences.setBool('isValidationDone', true);
 
-                                              // ------------- Create User information Local DB
-                                              newLocalDB.saveData(editProfile: userEditing);  
-                                              // ------------- Chart reference 
+                                                   // navigationbutton
+                                                   // ignore: use_build_context_synchronously
+                                                   Navigator.push(context, MaterialPageRoute(builder: ((context) => 
+                                                   MyProfile())));
+                                        }
+
+                                        // ------------- Update User information Local DB an FB
+                                        if(informaton == "Modifier"){
+                                          
+                                          debugPrint('<<------------ create local User now -------------->  ');
+                                                       // ------ Update in FB
+                                                   AddUser().upLoadData(_image!);
+
+                                                  // ------- Update in Local Db
+                                            
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.push(context, MaterialPageRoute(builder: ((context) => 
+                                                MyProfile())));
+                                               // ------------- Share refence
                                               SharedPreferences preferences = await  SharedPreferences.getInstance();
                                                 preferences.setBool('isValidationDone', true);
-                                  
+                                        }
                                       },
-                                      child: const Text("Yes")
+                                      child:   Text("Yes")
                                       )  
                                   ],
                                 )
                                 )
                                 );
                          }
-                         else{
-                               if(_imgesProile.isEmpty){
+                         
+                        if(_imgesProile.isEmpty ){
                            print('------------- update Local data');
                             showDialog(context: context, builder: ((context) => 
                                AlertDialog(
@@ -741,27 +838,10 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                    mainAxisSize: MainAxisSize.min,
                                    children: [
                                     Lottie.asset(AssetsFile.emptyImage1),
-                                   
                                      SizedBox(height: 4.h),
-                                //      Text("Avez vous selectionner une image ? ",
-                                //        style: GoogleFonts.poppins(
-                                //          fontSize: 18
-                                //  ),),
                                    ],
                                  ),
                                  actions: [
-                                  //  TextButton(
-                                  //    onPressed: (){
-                                  //     setState(() {
-                                  //       setState(() {
-                                  //        Navigator.of(context).pop();
-                                  //      });
-                                        
-                                  //     });
-                                  //    },
-                                  //    child: const Text("Proceed")
-                                  //    ),
-                           
                                    TextButton(
                                      onPressed: (){
                                        setState(() {
@@ -775,8 +855,8 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                            
                                )
                                );     
-          }
-                         }
+                          }
+                         
                       },
                       child:Text(
                         "$informaton",

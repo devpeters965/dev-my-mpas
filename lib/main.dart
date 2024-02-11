@@ -5,8 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart';
 import 'package:real_track/feature/auth/domain/usercase/check_service_map_state.dart';
-import 'package:real_track/feature/auth/presentation/widget/form/connection/sign_ins.dart';
-import 'feature/auth/presentation/page/authen_flow_screen.dart';
+import 'package:real_track/firebase_connexion_screen.dart';
 
  Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +31,9 @@ class MyApp extends StatelessWidget {
           return  const MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        home:    AuthenticationFlowScreen()
+        home:   AuthGate() 
+        
+        // AuthenticationFlowScreen()
           );
           
         // FutureBuilder(
@@ -73,7 +74,7 @@ class MyApp extends StatelessWidget {
         } 
       );
   }
-  // AuthGate()
+ 
 }
 
 

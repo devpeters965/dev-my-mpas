@@ -1,16 +1,29 @@
 
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:real_track/config/theme/assets.dart';
+import 'package:real_track/config/theme/style.dart';
+import 'package:real_track/core/usercase/usercase.dart';
+import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart';
 import 'package:real_track/feature/auth/data/model/user_info.dart';
+import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
 import 'package:real_track/feature/auth/presentation/page/profile_view_flow.dart';
+import 'package:real_track/feature/auth/presentation/widget/form/connection/google_sign.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
 class UserMenu extends StatefulWidget {
-  const UserMenu({super.key});
+  const UserMenu({super.key, this.userModel});
+  final UserModel? userModel;
  
-
   @override
   State<UserMenu> createState() => _UserMenuState();
 }
@@ -19,25 +32,144 @@ class _UserMenuState extends State<UserMenu> {
 
   final Uri _uri = Uri.parse('https://dev-y0ca.onrender.com');
   final Uri _uri1 = Uri.parse('mailto:devpeters965@gmail.com');
+  
+ 
 
   @override
   Widget build(BuildContext context) {
+    final _controller = Get.put(LoginController());
+    late  UserModel userItem ;
+    
+    
+
+
     return Drawer(
       child:ListView(
         padding: EdgeInsets.zero,
         children: [
-          UserAccountsDrawerHeader(
-           accountName:  Text( 'Real truck'),
-           accountEmail: Text(''),
-          currentAccountPicture: CircleAvatar(
-            child: ClipOval(
-              child: Image.network('https://images.pexels.com/photos/6652302/pexels-photo-6652302.jpeg?auto=compress&cs=tinysrgb&w=600',fit: BoxFit.cover,width:90, height: 90 ,)   ),    
-          ),
-          decoration: const BoxDecoration(
-            color: Colors.black,
-          ),
-          ),
 
+
+          Column(
+            children: [
+              Container(
+                color: Colors.black,
+                  height: MediaQuery.sizeOf(context).height/4.h,
+                   child: StreamBuilder<List<UserModel>?>(
+                    stream:  LocatData().allEdit(),
+                    //  stream:  LocatData().allEdit(),
+                    // stream: LocatData().fectAllNote(),
+                      builder: (context , snapshort){
+                       if(snapshort.connectionState == ConnectionState.waiting){
+                         print("-------- data isSvace into local db ");
+                         return SizedBox(
+                          height: MediaQuery.sizeOf(context).height,
+                          width: MediaQuery.sizeOf(context).width,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                             CircularProgressIndicator(
+                              color: MyColors.greens
+                             )
+                            ],
+                          ),
+                         );
+            
+                       }
+            
+                       if(!snapshort.hasData){
+                         return Container(
+                          color: Colors.white,
+                          child:  Column(
+                            children: [
+                              // ClipOval(
+                              //   child: SvgPicture.asset(AssetsFile.groupSvg,
+                              //     fit: BoxFit.cover,width:90, height: 90 
+                              //     )   ),
+                                   UserAccountsDrawerHeader(
+                                          accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                          accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                          currentAccountPicture: CircleAvatar(
+                                            child: ClipOval(
+                                              child: Image.file(File(userItem.images,),
+                                                fit: BoxFit.cover,width:90, height: 90 
+                                                )   ),    
+                                             ),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black,
+                                          ),
+                                          ) 
+                             
+                            ],
+                          ),
+                         );
+                       }
+                       print('------------- local db data ${snapshort.data}');
+                   
+                       final userInfo = snapshort.data;
+                   
+                       return ListView.builder(
+                         itemCount: userInfo!.length,
+                         itemBuilder: (context, index){
+                            userItem = userInfo[index];
+                           print('-------------my image ${userItem.images}');
+                           
+                         return Column(
+                         children: [
+
+                            userItem.images.isNotEmpty?
+
+                                         UserAccountsDrawerHeader(
+                                          accountName:  Text(_controller.googleAccount.value?.displayName?? userItem.managerNames,style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                          accountEmail: Text(_controller.googleAccount.value?.email?? userItem.email,style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                          currentAccountPicture: CircleAvatar(
+                                            child: ClipOval(
+                                              child: Image.file(File(userItem.images,),
+                                                fit: BoxFit.cover,width:90, height: 90 
+                                                )   ),    
+                                             ),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black,
+                                          ),
+                                          ) 
+                                        :
+                                          SvgPicture.asset("assets/icons/Online world-cuate.svg", fit: BoxFit.cover,width:90, height: 90 ),
+            
+                         ]
+                         );
+            
+                                   
+            
+                       
+                   
+                   
+                   
+                       });
+                         })
+                        //  widget.userItem.images.isNotEmpty?
+                        // : 
+                        //   UserAccountsDrawerHeader(
+                        //                   accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
+                        //                   accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
+                        //                   currentAccountPicture: CircleAvatar(
+                        //                     child: ClipOval(
+                        //                       child: Image.file(File(userItem.images,),
+                        //                         fit: BoxFit.cover,width:90, height: 90 
+                        //                         )   ),    
+                        //                      ),
+                        //                   decoration: const BoxDecoration(
+                        //                     color: Colors.black,
+                        //                   ),
+                        //                   ) 
+                  ),
+         
+            ],  ),
+
+        
+             ListTile(
+              title: const Text('Home'),
+              leading:  Icon(CupertinoIcons.home,color: Colors.teal.shade300,),
+              onTap: () =>  Navigator.push(context, MaterialPageRoute(builder: (context)=>  rincipalView()))
+              ),
           
             ListTile(
               title: const Text('Creer Profile'),

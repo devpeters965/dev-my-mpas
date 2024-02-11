@@ -370,7 +370,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [ 
                                                         Text( users['communes']?? '' ,style:  GoogleFonts.poppins(color: Colors.black),),
-                                                         Text(  users['bussinessNames']  ,style: GoogleFonts.poppins(color: Colors.black),),
+                                                         Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(color: Colors.black),),
                                                         RichText(text: TextSpan(
                                                           children: [
                                                              TextSpan(

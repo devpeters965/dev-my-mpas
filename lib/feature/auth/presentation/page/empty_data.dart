@@ -13,7 +13,7 @@ class EmptyView extends StatelessWidget {
          Lottie.asset(AssetsFile.emptyJson),
 
          Text(
-          "Aucune donnée disponible",
+          "Aucune information disponible",
            style:GoogleFonts.poppins(fontSize: 18) ,)
 
       ],

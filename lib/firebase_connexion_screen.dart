@@ -4,6 +4,8 @@ import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:isar/isar.dart';
+import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
 
 // import 'home.dart';
@@ -19,18 +21,21 @@ class AuthGate extends StatelessWidget {
      builder: (context, snapshot) {
        if (!snapshot.hasData) {
          return SignInScreen(
+          
            providers: [
              EmailAuthProvider(),
              GoogleProvider(
               clientId: "974168670209-vmud8tdq4isc1h7kt2bgbup3io6spli9.apps.googleusercontent.com",
+              iOSPreferPlist: true
               ),  // new
            ],
-          //  headerBuilder: (context, constraints, shrinkOffset) {
-          //    return Padding(
-          //      padding: const EdgeInsets.all(20),
-          //      child: SvgPicture.asset("assets/icons/Personal site-pana.svg")
-          //    );
-          //  },
+           headerBuilder: (context, constraints, shrinkOffset) {
+            
+             return Padding(
+               padding: const EdgeInsets.all(20),
+               child: SvgPicture.asset(AssetsFile.assetsLoginSvg)
+             );
+           },
            subtitleBuilder: (context, action) {
              return Padding(
                padding: const EdgeInsets.symmetric(vertical: 8.0),
