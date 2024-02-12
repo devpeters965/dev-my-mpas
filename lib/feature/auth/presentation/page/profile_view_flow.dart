@@ -22,7 +22,7 @@ class _ProfileViewFlowState extends State<ProfileViewFlow> {
   void initState() {
     super.initState();
   }
-  Future<bool> checkUserIsRegitre() async{
+  Future<bool> isCreateCompte() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     bool isValidationDone = preferences.getBool('isValidationDone')?? false;
     return isValidationDone;
@@ -32,7 +32,7 @@ class _ProfileViewFlowState extends State<ProfileViewFlow> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     return  FutureBuilder<bool>(
-      future: checkUserIsRegitre(), 
+      future: isCreateCompte(), 
       builder: (context, snapshot){
         if(snapshot.connectionState == ConnectionState.waiting){
           CircularProgressIndicator.adaptive(
@@ -43,9 +43,13 @@ class _ProfileViewFlowState extends State<ProfileViewFlow> {
             print("=========== take Home Screen");
              AutomateNavigator.getScreen(2,context,  MyProfile());
         }
-        else{
+        if (!snapshot.hasData) {
              print("============= take to regitrer logine");
              AutomateNavigator.getScreen(2,context,  const  CreateLocalCompte(rowBackEditProfile: false,));
+            // Navigator.push(context, MaterialPageRoute(builder: (context)=> CreateLocalCompte(rowBackEditProfile: false,)));
+          
+        }{
+           
         }
         return Container(
           height: size.height,

@@ -185,9 +185,6 @@ class _MyProfileState extends State<MyProfile> {
                        itemBuilder: (context, index){
                           userItem = userInfo[index];
                          print('-------------my image ${userItem.images}');
-                         
-                 
-                 
                        return Column(
                        children: [
           

@@ -32,6 +32,8 @@ class _UserMenuState extends State<UserMenu> {
 
   final Uri _uri = Uri.parse('https://dev-y0ca.onrender.com');
   final Uri _uri1 = Uri.parse('mailto:devpeters965@gmail.com');
+
+  late  bool isCreateCompte = true ;
   
  
 
@@ -48,18 +50,20 @@ class _UserMenuState extends State<UserMenu> {
         padding: EdgeInsets.zero,
         children: [
 
+          // isCreateCompte == true  ?
 
-          Column(
+            Column(
             children: [
               Container(
                 color: Colors.black,
                   height: MediaQuery.sizeOf(context).height/4.h,
                    child: StreamBuilder<List<UserModel>?>(
                     stream:  LocatData().allEdit(),
-                    //  stream:  LocatData().allEdit(),
-                    // stream: LocatData().fectAllNote(),
                       builder: (context , snapshort){
                        if(snapshort.connectionState == ConnectionState.waiting){
+                          setState(() {
+                          // isCreateCompte == false;
+                        });
                          print("-------- data isSvace into local db ");
                          return SizedBox(
                           height: MediaQuery.sizeOf(context).height,
@@ -73,18 +77,15 @@ class _UserMenuState extends State<UserMenu> {
                             ],
                           ),
                          );
-            
                        }
+
             
                        if(!snapshort.hasData){
+                      
                          return Container(
                           color: Colors.white,
                           child:  Column(
                             children: [
-                              // ClipOval(
-                              //   child: SvgPicture.asset(AssetsFile.groupSvg,
-                              //     fit: BoxFit.cover,width:90, height: 90 
-                              //     )   ),
                                    UserAccountsDrawerHeader(
                                           accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
                                           accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
@@ -98,7 +99,6 @@ class _UserMenuState extends State<UserMenu> {
                                             color: Colors.black,
                                           ),
                                           ) 
-                             
                             ],
                           ),
                          );
@@ -110,60 +110,55 @@ class _UserMenuState extends State<UserMenu> {
                        return ListView.builder(
                          itemCount: userInfo!.length,
                          itemBuilder: (context, index){
+
+                      
+
                             userItem = userInfo[index];
                            print('-------------my image ${userItem.images}');
                            
                          return Column(
                          children: [
-
                             userItem.images.isNotEmpty?
-
-                                         UserAccountsDrawerHeader(
-                                          accountName:  Text(_controller.googleAccount.value?.displayName?? userItem.managerNames,style: GoogleFonts.poppins(fontSize: 12.sp),),
-                                          accountEmail: Text(_controller.googleAccount.value?.email?? userItem.email,style: GoogleFonts.poppins(fontSize: 12.sp),),
-                                          currentAccountPicture: CircleAvatar(
-                                            child: ClipOval(
-                                              child: Image.file(File(userItem.images,),
-                                                fit: BoxFit.cover,width:90, height: 90 
-                                                )   ),    
-                                             ),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.black,
-                                          ),
-                                          ) 
-                                        :
-                                          SvgPicture.asset("assets/icons/Online world-cuate.svg", fit: BoxFit.cover,width:90, height: 90 ),
-            
+                              UserAccountsDrawerHeader(
+                              accountName:  Text(_controller.googleAccount.value?.displayName?? userItem.managerNames,style: GoogleFonts.poppins(fontSize: 12.sp),),
+                              accountEmail: Text(_controller.googleAccount.value?.email?? userItem.email,style: GoogleFonts.poppins(fontSize: 12.sp),),
+                              currentAccountPicture: CircleAvatar(
+                                child: ClipOval(
+                                  child: Image.file(File(userItem.images,),
+                                    fit: BoxFit.cover,width:90, height: 90 
+                                    )   ),    
+                                  ),
+                              decoration: const BoxDecoration(
+                                color: Colors.black,
+                              ),
+                              ) 
+                            :
+                              SvgPicture.asset("assets/icons/Online world-cuate.svg", fit: BoxFit.cover,width:90, height: 90 ),
                          ]
                          );
-            
-                                   
-            
-                       
-                   
-                   
-                   
                        });
                          })
-                        //  widget.userItem.images.isNotEmpty?
-                        // : 
-                        //   UserAccountsDrawerHeader(
-                        //                   accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
-                        //                   accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
-                        //                   currentAccountPicture: CircleAvatar(
-                        //                     child: ClipOval(
-                        //                       child: Image.file(File(userItem.images,),
-                        //                         fit: BoxFit.cover,width:90, height: 90 
-                        //                         )   ),    
-                        //                      ),
-                        //                   decoration: const BoxDecoration(
-                        //                     color: Colors.black,
-                        //                   ),
-                        //                   ) 
                   ),
          
             ],  ),
 
+          //   :
+
+          // UserAccountsDrawerHeader(
+          //   accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
+          //   accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
+          //   currentAccountPicture: CircleAvatar(
+          //     child: ClipOval(
+          //       child: SvgPicture.asset(AssetsFile.thinksSvg, fit: BoxFit.cover,width:90, height: 90 ),
+                  
+          //         )   ),    
+          //       ),
+                
+          //  Container(),
+                                      
+
+
+        
         
              ListTile(
               title: const Text('Home'),
@@ -181,7 +176,6 @@ class _UserMenuState extends State<UserMenu> {
             ListTile(
               title: const Text('Call back'),
               leading:  Icon(Icons.email,color: Colors.teal.shade300,),
-              // onTap: () =>  Navigator.push(context, MaterialPageRoute(builder: (context)=>  MyFormNavigator())),
               onTap: urlLuancher1
             ),
           

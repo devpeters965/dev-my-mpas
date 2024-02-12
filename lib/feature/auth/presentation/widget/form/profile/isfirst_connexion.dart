@@ -65,6 +65,12 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
 
   final formkey = GlobalKey<FormState>();
 
+  final managerkey = GlobalKey<FormState>();
+  final bussinesKey = GlobalKey<FormState>();
+  final phoneKey = GlobalKey<FormState>();
+  final emailKey = GlobalKey<FormState>();
+  final descriptionKey = GlobalKey<FormState>();
+
    
 
   //  List<UserModel> user_info = [];
@@ -155,7 +161,6 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
     return  Scaffold(
       drawer:  UserMenu(),
       appBar: AppBar(
-        // automaticallyImplyLeading:   widget.rowBackEditProfile,
         backgroundColor: Colors.black,
         leading: widget.rowBackEditProfile == true ? GestureDetector(
           onTap: () {
@@ -165,72 +170,89 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                 builder: (context){
                 return  MyProfile();
             }));
-
-            // Navigator.pop(context);
           },
           child: const Icon(CupertinoIcons.back,color: Colors.white,),
         )
         :Container()
       ),
       body: SafeArea(
-        child: Column(
-                  children: [
-               Align(
-                alignment: Alignment.center,
-                child: Stack(
-                  children:[
-                     _imgesProile == ''?
-                     Expanded(
-                       child: Container(
-                             height: 200.h,
-                             width: 200.w,
-                             decoration: const BoxDecoration(
-                              // color: Colors.red,
-                              shape: BoxShape.circle
-                             ),
-                        child: SvgPicture.asset("assets/icons/Online world-cuate.svg",
-                        height: MediaQuery.sizeOf(context).height/5.h,
-                        
-                        ),
-                       ),
-                     )
-                     :
-        
-                     ClipRRect(
-                       child: Image.file(File(_imgesProile))),
-        
-                  Positioned(
-                    bottom: 9.h,
-                     right: 10.h,
-                    // left: 10.h,
-                    child: Align(
-                      alignment: const Alignment(0.3, 0.5 ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: MyColors.greens,
-                          shape: BoxShape.circle
-                        ),
-                        child: IconButton(
-                                onPressed: (){
-                                  selectImages();
-                                }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
-                      ),),
-                  )
-                  ]
-                )
-              ),
-        
-               SizedBox(
-                 height: 9.h,
-                ),
-                           Form(
-                            key: formkey,
-                             child: Expanded(
+        child: Container(
+          height: MediaQuery.sizeOf(context).height,
+          width: MediaQuery.sizeOf(context).width,
+          child: Column(
+                    children: [
+                 SizedBox(
+                   height: 2.h,
+                  ),
+
+                  
+                      Align(
+                      alignment: Alignment.center,
+                      child: Stack(
+                        children:[
+                          _imgesProile == ''?
+                            Container(
+                                  height: 200.h,
+                                  width: 200.w,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle
+                                  ),
+                              child: SvgPicture.asset("assets/icons/Online world-cuate.svg",
+                              height: MediaQuery.sizeOf(context).height/5.h,
+                              ),
+                            )
+                          :
+
+                            Container(
+                              decoration: const BoxDecoration(
+                                // color: Colors.red,
+                                shape: BoxShape.circle
+                                ),
+                                child: ClipRRect(
+                                child: Image.file(File(_imgesProile))),
+                                ),
+
+                          // CircleAvatar(
+                          //   radius: 12.h,
+                          //   child: Image.file(File(_imgesProile),
+                          //   //  height: MediaQuery.sizeOf(context).height/1.h,
+                          //   //  width: MediaQuery.sizeOf(context).width/3.w,
+                          //   )
+                          // ),
+                          
+                          
+                        Positioned(
+                          bottom: 9.h,
+                          right: 10.h,
+                          // left: 10.h,
+                          child: Align(
+                            alignment: const Alignment(0.3, 0.5 ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.greens,
+                                shape: BoxShape.circle
+                              ),
+                              child: IconButton(
+                                      onPressed: (){
+                                        selectImages();
+                                      }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
+                            ),),
+                        )
+                        ]
+                      )
+                    ),
+              
+
+
+
+                             Expanded(
+                              // sinli scrole view
                                child: SingleChildScrollView(
                                  child: Column(
                                   children: [
+
                                        GestureDetector(
-                                      onTap: () {
+                                       onTap: () {
                                        showDialog(
                                               context: context, builder: ((context) => 
                                           AlertDialog(
@@ -239,62 +261,77 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                               fontSize: 19
                                             ),),
                                             content: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CustomerForm(
-                                                    label: 'Manager name',
-                                                    textController: managerName,
-                                                    validation: (value) => value == null || value.isEmpty? 'Le champs est requis' : null,
-                                                  ),
-                                                  SizedBox(height: 4.h),
-                                                  Text("Voullez vous apporter des modification ? ",
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 18
-                                              ),),
-                                                ],
+                                              child: Form(
+                                                key: managerkey,
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    CustomerForm(
+                                                      label: 'Manager name',
+                                                      textController: managerName,
+                                                      validation: (value) => value == null || value.isEmpty? 'Le champs est requis' : null,
+                                                    ),
+                                                    SizedBox(height: 4.h),
+                                                    Text("Voullez vous apporter des modification ? ",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 18
+                                                ),),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             actions: [
                                               TextButton(
                                                 onPressed: (){
                                                   Navigator.pop(context);
-                                                  managerName.clear();
+                                                   setState(() {
+                                                     managerName.clear();
+                                                   });
                                                 },
                                                 child: const Text("Proceed")
                                                 ),
-                                      
+                                                                           
                                               TextButton(
                                                 onPressed: (){
-                                                  // Navigator.of(context).pop();
-                                                  setState(() {
+                                                  if(managerkey.currentState!.validate()){
+                                                       setState(() {
                                                     Navigator.of(context).pop();
-                                                    
-                                                  });
+                                                  });            
+                                                  }
                                                 },
                                                 child: const Text("Yes")
                                                 )  
                                             ],
                                           )
-                                      
+                                                                           
                                           )
                                           );     
                                                           
-                                      },
-                                      child: Container(
+                                          },
+                                       child: Container(
                                         margin: EdgeInsets.only(left: 5.sp),
                                         child: Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text(
-                                            managerName.text.isEmpty?
-                                               'Manager name'
-                                            :  managerName.text
-                                            ,
-                                            style: GoogleFonts.poppins(fontSize: 20.sp)
-                                            ),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                managerName.text.isEmpty?
+                                                   'Manager name'
+                                                :  managerName.text
+                                                ,
+                                                style: GoogleFonts.poppins(fontSize: 20.sp)
+                                                ),
+                                                 SizedBox(width: 3.w),
+                                                 managerName.text.isEmpty?
+                                                 Icon(CupertinoIcons.pen,color: MyColors.grey,)
+                                                 : Container()
+
+                                              
+                                            ],
+                                          ),
+                                        ),
                                         ),
                                       ),
-                                    ),
                                            
                                     SizedBox(height: 4.sp),
                                            
@@ -307,20 +344,23 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                               fontSize: 19
                                             ),),
                                             content: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CustomerForm(
-                                                    label: 'Business name',
-                                                    textController: bussinessName,
-                                                    validation: (value) => value == null || value.isEmpty? 'Le champs est requis' : null,
-                                                  ),
-                                                  SizedBox(height: 4.h),
-                                                  Text("Voullez vous apporter des modification ? ",
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 18
-                                              ),),
-                                                ],
+                                              child: Form(
+                                                key: bussinesKey,
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    CustomerForm(
+                                                      label: 'Business name',
+                                                      textController: bussinessName,
+                                                      validation: (value) => value == null || value.isEmpty? 'Le champs est requis' : null,
+                                                    ),
+                                                    SizedBox(height: 4.h),
+                                                    Text("Voullez vous apporter des modification ? ",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 18
+                                                ),),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             actions: [
@@ -336,16 +376,18 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       
                                               TextButton(
                                                 onPressed: (){
-                                                  setState(() {
+
+                                                if(bussinesKey.currentState!.validate()){
+                                                       setState(() {
                                                     Navigator.of(context).pop();
-                                                  });
+                                                  });            
+                                                  }
                                  
                                                 },
                                                 child: const Text("Yes")
                                                 )  
                                             ],
                                           )
-                                      
                                           )
                                           );     
                                                           
@@ -354,20 +396,30 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                         margin: EdgeInsets.only(left: 5.sp),
                                         child: Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text(
-                                            bussinessName.text.isEmpty?
-                                             'bussines'
-                                             : bussinessName.text,
-                                            style: GoogleFonts.poppins(fontSize: 20.sp)
-                                            ),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                bussinessName.text.isEmpty?
+                                                 'bussines'
+                                                 : bussinessName.text,
+                                                style: GoogleFonts.poppins(fontSize: 20.sp)
+                                                ),
+                                                 bussinessName.text.isEmpty?
+                                                 Icon(CupertinoIcons.pen,color: MyColors.grey,)
+                                                 : Container()
+
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
+
+                                    SizedBox(height: 5.h),
                                            
                                            
-                                      Row(
+                                 Row(
                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                             children: [
+                                 children: [
                                  GestureDetector(
                                       onTap: () {
                                          showDialog(context: context, builder: ((context) => 
@@ -377,32 +429,35 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                               fontSize: 19
                                             ),),
                                             content: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CustomerForm(
-                                                    label: 'Contact',
-                                                    textController: phoneNumber,
-                                                    textInputType: TextInputType.phone,
-                                                    validation: (value) {
-                                                      if(value == null || value.isEmpty){
-                                                        return 'Champs est requis';
+                                              child: Form(
+                                                key: phoneKey,
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    CustomerForm(
+                                                      label: 'Contact',
+                                                      textController: phoneNumber,
+                                                      textInputType: TextInputType.phone,
+                                                      validation: (value) {
+                                                        if(value == null || value.isEmpty){
+                                                          return 'Champs est requis';
+                                                        }
+                                                        if (value.length != 10) {
+                                                          return 'nous somme a dix chiffre';
+                                                        }
+                                                        if (value.contains(RegExp('r[0-9]'))) {
+                                                          
+                                                        }
+                                                        return null;
                                                       }
-                                                      if (value.length == 10) {
-                                                        return 'nous somme a dix chiffre';
-                                                      }
-                                                      if (value.contains(RegExp('r[0-9]'))) {
-                                                        
-                                                      }
-                                                      return null;
-                                                    }
-                                                  ),
-                                                  SizedBox(height: 4.h),
-                                                  Text("Voullez vous apporter des modification ? ",
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 18
-                                              ),),
-                                                ],
+                                                    ),
+                                                    SizedBox(height: 4.h),
+                                                    Text("Voullez vous apporter des modification ? ",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 18
+                                                ),),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             actions: [
@@ -418,9 +473,11 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       
                                               TextButton(
                                                 onPressed: (){
-                                                  setState(() {
+                                                   if(phoneKey.currentState!.validate()){
+                                                       setState(() {
                                                     Navigator.of(context).pop();
-                                                  });
+                                                  });            
+                                                  }
                                                 },
                                                 child: const Text("Yes")
                                                 )  
@@ -468,28 +525,32 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                               fontSize: 19
                                             ),),
                                             content: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                   CustomerForm(
-                                                    label: 'Email',
-                                                    textController: mysemail,
-                                                    validation: (value) {
-                                                       if(value == null || value.isEmpty){
-                                                        return 'Champs est requis';
+                                              child: Form(
+                                                key: emailKey,
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                     CustomerForm(
+                                                      label: 'Email',
+                                                      textController: mysemail,
+                                                      textInputType: TextInputType.emailAddress,
+                                                      validation: (value) {
+                                                         if(value == null || value.isEmpty){
+                                                          return 'Champs est requis';
+                                                        }
+                                                        if (value.contains(RegExp('r[@]'))) {
+                                                          return 'le champs est requis @';
+                                                        }
+                                                        return null;
+                                                              
                                                       }
-                                                      if (value.contains('@')) {
-                                                        return 'le champs est requis @';
-                                                      }
-                                                      return null;
-                             
-                                                    }
-                                                    ),
-                                                  Text("Voullez vous apporter des modification ?",
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 18
-                                              ),),
-                                                ],
+                                                      ),
+                                                    Text("Voullez vous apporter des modification ?",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 18
+                                                ),),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             actions: [
@@ -505,9 +566,11 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       
                                               TextButton(
                                                 onPressed: (){
-                                                 setState(() {
+                                                   if(emailKey.currentState!.validate()){
+                                                       setState(() {
                                                     Navigator.of(context).pop();
-                                                 });
+                                                  });            
+                                                  }
                                                 },
                                                 child: const Text("Yes")
                                                 )  
@@ -621,7 +684,9 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       ),
                                     )
                                        ],
-                                                         ),
+                                    ),
+
+                                   const  SizedBox(height: 10),
                                                          
                                   GestureDetector(
                                     onTap: () {
@@ -632,20 +697,23 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                               fontSize: 19
                                             ),),
                                             content: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CustomerForm(
-                                                    label: 'description',
-                                                    textController: desciption,
-                                                    validation: (value) => value == null || value.isEmpty ? 'Champs est requis': null  ,
-                                                  ),
-                                                  SizedBox(height: 4.h),
-                                                  Text("Voullez vous apporter des modification ? ",
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 18
-                                              ),),
-                                                ],
+                                              child: Form(
+                                                key: descriptionKey,
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    CustomerForm(
+                                                      label: 'description',
+                                                      textController: desciption,
+                                                      validation: (value) => value == null || value.isEmpty ? 'Champs est requis': null  ,
+                                                    ),
+                                                    SizedBox(height: 4.h),
+                                                    Text("Voullez vous apporter des modification ? ",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 18
+                                                ),),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             actions: [
@@ -661,10 +729,11 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       
                                               TextButton(
                                                 onPressed: (){
-                                                 setState(() {
-                                                     Navigator.pop(context);
-                                                  // Navigator.pop(context);
-                                                 });
+                                                 if(descriptionKey.currentState!.validate()){
+                                                    setState(() {
+                                                    Navigator.of(context).pop();
+                                                  });            
+                                                  }
                                                 },
                                                 child: const Text("Yes")
                                                 )  
@@ -673,55 +742,65 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       
                                           )
                                           );     
-                                },
-                                child: Text("Description",
-                                style: GoogleFonts.poppins(fontSize: 23.sp)
-                              ),),
-                              
-                              
-                              SizedBox(
-                                height: 14.h,
-                                ),
-                              Container(
-                                padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                   SizedBox(
-                                      width: MediaQuery.sizeOf(context).width/2,
-                                      child:  Text(
-                                          desciption.text.isEmpty?
-                                          "Description"
-                                          :desciption.text,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 16.sp
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text("Description",
+                                            style: GoogleFonts.poppins(fontSize: 23.sp)
+                                            ),
+
+                                            SizedBox(width: 3.h),
+                                               desciption .text.isEmpty?
+                                               Icon(CupertinoIcons.pen,color: MyColors.grey,)
+                                              : Container()
+                                            
+                                          ],
+                                        ),),
+                                      
+                                      
+                                      SizedBox(
+                                        height: 14.h,
                                         ),
-                                          textAlign: TextAlign.start,
+                                      Container(
+                                        padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                          SizedBox(
+                                              width: MediaQuery.sizeOf(context).width/2,
+                                              child:  Text(
+                                                  desciption.text.isEmpty?
+                                                  "Description"
+                                                  :desciption.text,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 16.sp
+                                                ),
+                                                  textAlign: TextAlign.start,
+                                                  )
+                                            ),
+                                        
+                                          Expanded(
+                                            child: SvgPicture.asset(AssetsFile.socialMediasvg,
+                                            width: MediaQuery.sizeOf(context).width/2,
+                                            ),
                                           )
-                                    ),
-                                 
-                                  Expanded(
-                                    child: SvgPicture.asset(AssetsFile.socialMediasvg,
-                                    width: MediaQuery.sizeOf(context).width/2,
-                                    ),
-                                  )
-                                                             ],
-                                                           ),
-                                                         )
-                                     
+                                        ],
+                                      ),
+                                    )
                                   ],
                                  ),
                                ),
-                             ),
-                           )    
-                            ],
-                    ),
+                             )    
+                              ],
+                      ),
+                  ),
                   ),
                      floatingActionButton:  FloatingActionButton(
                       backgroundColor: MyColors.greens,
                       onPressed: (){
-                       if (formkey.currentState!.validate()) {
-                          if(_imgesProile.isNotEmpty){
+                      
+                        if(_imgesProile.isNotEmpty){
                            showDialog(context: context, builder: ((context) => 
                                 AlertDialog(
                                   title: Text("Enregister votre modification.",
@@ -782,7 +861,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                            Navigator.of(context).pop();
                                      
                                         }
-                                        }, child: Text("Ok"))
+                                        }, child: const Text("Ok"))
                                     :  
                                        TextButton(
                                       onPressed: ()async{
@@ -799,7 +878,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                                    Navigator.push(context, MaterialPageRoute(builder: ((context) => 
                                                    MyProfile())));
                                         }
-                                        if(informaton == "Modifier"){
+                                                     if(informaton == "Modifier"){
                                           
                                                    UserCase.usercase.updateUserInfo(userUpdate);
                                                     AddUser().upLoadData(_image!);
@@ -850,7 +929,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                )
                                );     
                           }
-                       }
+                       
                       },
                       child:Text(
                         "$informaton",

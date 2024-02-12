@@ -28,55 +28,80 @@ class MyApp extends StatelessWidget {
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
-          return  const MaterialApp(
+          return   const MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        home:   AuthGate() 
+        home:  AuthGate()
         
         // AuthenticationFlowScreen()
           );
           
-        // FutureBuilder(
-        //     future: defaultPosition(),
-        //     builder: (context, snap) {
-        //       if (snap.hasData) {
-        //         return const FlashScreen(
-        //         );
-        //       }
-        //       else {
-        //        return  Scaffold(
-        //           body: Container(
-        //             margin: const EdgeInsets.symmetric(vertical: 5,horizontal: 7),
-        //             child: Column(
-        //               children: [
-        //                 Expanded(
-        //                   child: Lottie.asset(AssetsFile.mapAnimation)
-        //                   ),
-        //                   TextButton(onPressed: (){
-        //                     AutomateNavigator.getScreen(5,
-        //                      context, Navigator.of(context));
-        //                   },
-        //                    child: const Text("")),
-        //                    const SizedBox(
-        //                     height: 5,
-        //                    ),
-        //                   CircularProgressIndicator(
-        //                   color: MyColors.grey,
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //         );
-        //       }
-        //     },
-        //   ));
-        
+      
         } 
       );
   }
  
 }
 
+
+
+
+// WillPopScope(
+//           child: AuthGate(), 
+//           onWillPop: ()async{ 
+//            final value =     await showDialog<bool>(
+//             context: context,
+//              builder: (context){
+//               return AlertDialog(
+//                 title:  const Text("Alerte",
+//                          style: TextStyle(color: Colors.red,
+//                           fontWeight: FontWeight.bold
+//                          ),
+//                 ),
+//                 content: const Text("Voulez vous quitter l'application"),
+//                 actions: [
+//                   ElevatedButton(
+//                     onPressed: (){
+//                       Navigator.of(context).pop(false);
+//                     },
+//                      style: ElevatedButton.styleFrom(
+//                       backgroundColor: Colors.white,
+
+//                     ),
+//                      child:  const Text("No",
+//                              style: TextStyle(
+//                               color: Colors.black
+//                              ),
+                     
+//                      )),
+
+//                      const SizedBox(width: 6,),
+
+//                    ElevatedButton(
+//                     onPressed: (){
+//                       Navigator.of(context).pop(true);
+//                     },
+//                      style: ElevatedButton.styleFrom(
+//                       backgroundColor: Colors.greenAccent,
+
+//                     ),
+//                      child:  const Text("Exit", style: TextStyle(
+//                               color: Colors.black
+//                              ),
+//                      )),   
+//                 ],
+                
+                
+//               );
+//             });
+//              if(value != null){
+//               return Future.value(value);
+//             }
+//             else{
+//               return Future.value(false);
+//             }
+
+//          },)
 
 
 
