@@ -53,13 +53,13 @@ class AuthGate extends StatelessWidget {
                ),
              );
            },
-           sideBuilder: (context, shrinkOffset) {
-             return Padding(
-               padding: const EdgeInsets.all(20),
-               child: SvgPicture.asset("assets/icons/Personal site-pana.svg")
+          //  sideBuilder: (context, shrinkOffset) {
+          //    return Padding(
+          //      padding: const EdgeInsets.all(20),
+          //      child: SvgPicture.asset("assets/icons/Personal site-pana.svg")
                
-             );
-           },
+          //    );
+          //  },
          );
        }
 

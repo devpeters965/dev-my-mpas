@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:readmore/readmore.dart';
 import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/core/animation/slade_effect.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
@@ -12,7 +13,7 @@ class DetailView extends StatefulWidget {
 
    final bool isSearchToggle;
    final DocumentSnapshot? item;
-   final Map<String, dynamic>?  search;
+   final Map<String, dynamic>? search;
 
 
   @override
@@ -44,7 +45,7 @@ class _DetailViewState extends State<DetailView> {
              Image.network(
                widget.isSearchToggle?
                  widget.item!['images'] 
-                 : widget.search!['images'], fit: BoxFit.cover
+                 : widget.search?['images'], fit: BoxFit.cover
              )),
           //  =========================== grage section place ===================================================
 
@@ -145,7 +146,7 @@ class _DetailViewState extends State<DetailView> {
                                             ]),
                                           ),
 
-                                           // ====================== Icons toggle section ============================================================
+                                          // ====================== Icons toggle section ============================================================
 
                                           Container(
                                             margin: EdgeInsets.only(top: 4.h),
@@ -268,18 +269,36 @@ class _DetailViewState extends State<DetailView> {
 
                             Container(
                               margin: EdgeInsets.symmetric(vertical: 12.h,horizontal: 12),
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 
-                                       widget.isSearchToggle?
+                            child: ReadMoreText(
+                                         widget.isSearchToggle?
                                         widget.item!['description']
-                                        : widget.search!['description'] ,style: GoogleFonts.poppins( color: const Color.fromARGB(255, 255, 255, 255), fontWeight: FontWeight.w800, fontSize: 12.sp),
-                                        )
-                                ]
-                              )
-                            ) ,
+                                        : widget.search!['description'] ,
+                                        trimLines: 3,
+                                        textAlign: TextAlign.start,
+                                        trimCollapsedText: "Show More",
+                                        trimExpandedText: "Show Less",
+                                        moreStyle: TextStyle(color: MyColors.greens),
+                                        lessStyle: TextStyle(color: MyColors.greens),
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white
+                                        ),
+                                      ),
+                            
+                            
+                            
+                            
+                            // RichText(
+                            //   text: TextSpan(
+                            //     children: [
+                            //       TextSpan(
+                            //         text: 
+                            //            widget.isSearchToggle?
+                            //             widget.item!['description']
+                            //             : widget.search!['description'] ,style: GoogleFonts.poppins( color: const Color.fromARGB(255, 255, 255, 255), fontWeight: FontWeight.w800, fontSize: 12.sp),
+                            //             )
+                            //     ]
+                            //   )
+                            // ) ,
                             ),
 
                       

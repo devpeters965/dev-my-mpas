@@ -17,5 +17,7 @@ samples, guidance on mobile development, and a full API reference.
 
 
 ## commande to build freezed
-
 - flutter pub run build_runner build --delete-conflicting-outputs
+
+## commande to build apk 
+- flutter build apk --release

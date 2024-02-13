@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:isar/isar.dart';
 import 'package:lottie/lottie.dart';
+import 'package:readmore/readmore.dart';
 import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
@@ -52,7 +53,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
         print('------------------ image name: $_imgesProile');
 
         if(_imgesProile.isNotEmpty){
-            Future.delayed(Duration(seconds: 3)).then((value) {
+            Future.delayed(const Duration(seconds: 3)).then((value) {
               setState(() {
                 showImage = true;
               });
@@ -159,7 +160,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
   Widget build(BuildContext context) {
    
     return  Scaffold(
-      drawer:  UserMenu(),
+      drawer:  const UserMenu(),
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: widget.rowBackEditProfile == true ? GestureDetector(
@@ -185,45 +186,54 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                    height: 2.h,
                   ),
 
-                  
+                  Expanded(
+                  // sinli scrole view
+                    child: SingleChildScrollView(
+                      child: Column(
+                      children: [            
                       Align(
                       alignment: Alignment.center,
                       child: Stack(
                         children:[
                           _imgesProile == ''?
                             Container(
-                                  height: 200.h,
-                                  width: 200.w,
+                                 height: MediaQuery.sizeOf(context).height/4.h,
+                                  width: MediaQuery.sizeOf(context).width/2.w,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle
                                   ),
-                              child: SvgPicture.asset("assets/icons/Online world-cuate.svg",
-                              height: MediaQuery.sizeOf(context).height/5.h,
+                              child: CircleAvatar(
+                                child: ClipOval(
+                                  child: SvgPicture.asset("assets/icons/Online world-cuate.svg",
+                                   height: MediaQuery.sizeOf(context).height.h,
+                                   width: MediaQuery.sizeOf(context).width.w
+                                  ),
+                                ),
                               ),
                             )
                           :
 
                             Container(
+                              height: MediaQuery.sizeOf(context).height/4.h,
+                             width: MediaQuery.sizeOf(context).width/2.w,
                               decoration: const BoxDecoration(
                                 // color: Colors.red,
                                 shape: BoxShape.circle
                                 ),
-                                child: ClipRRect(
-                                child: Image.file(File(_imgesProile))),
+                                child: CircleAvatar(
+                                  // radius: 1,
+                                  child: ClipOval(
+                                    child: Image.file(File(_imgesProile),
+                                    height: MediaQuery.sizeOf(context).height.h,
+                                    width: MediaQuery.sizeOf(context).width.w,
+                                    fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
-
-                          // CircleAvatar(
-                          //   radius: 12.h,
-                          //   child: Image.file(File(_imgesProile),
-                          //   //  height: MediaQuery.sizeOf(context).height/1.h,
-                          //   //  width: MediaQuery.sizeOf(context).width/3.w,
-                          //   )
-                          // ),
-                          
-                          
+                                ),
                         Positioned(
-                          bottom: 9.h,
-                          right: 10.h,
+                          bottom: 2.h,
+                          right: 0.h,
                           // left: 10.h,
                           child: Align(
                             alignment: const Alignment(0.3, 0.5 ),
@@ -241,101 +251,99 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                         ]
                       )
                     ),
-              
 
+                    SizedBox(height: 9.h),
 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                             GestureDetector(
+                    onTap: () {
+                    showDialog(
+                          context: context, builder: ((context) => 
+                      AlertDialog(
+                        title: Text("Ajouter le Manager name ",
+                        style: GoogleFonts.poppins(
+                          fontSize: 19
+                        ),),
+                        content: SingleChildScrollView(
+                          child: Form(
+                            key: managerkey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CustomerForm(
+                                  label: 'Manager name',
+                                  textController: managerName,
+                                  validation: (value) => value == null || value.isEmpty? 'Le champs est requis' : null,
+                                ),
+                                SizedBox(height: 4.h),
+                                Text("Voullez vous apporter des modification ? ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18
+                            ),),
+                              ],
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: (){
+                              Navigator.pop(context);
+                                setState(() {
+                                  managerName.clear();
+                                });
+                            },
+                            child: const Text("Proceed")
+                            ),
+                                                        
+                          TextButton(
+                            onPressed: (){
+                              if(managerkey.currentState!.validate()){
+                                    setState(() {
+                                Navigator.of(context).pop();
+                              });            
+                              }
+                            },
+                            child: const Text("Yes")
+                            )  
+                        ],
+                      )
+                                                        
+                      )
+                      );     
+                                      
+                      },
+                    child: Container(
+                    margin: EdgeInsets.only(left: 5.sp),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Row(
+                        children: [
+                          Text(
+                            managerName.text.isEmpty?
+                                'Manager name'
+                            :  managerName.text
+                            ,
+                            style: GoogleFonts.poppins(fontSize: 20.sp)
+                            ),
+                              SizedBox(width: 3.w),
+                              managerName.text.isEmpty?
+                              Icon(CupertinoIcons.pen,color: MyColors.grey,)
+                              : Container()
 
-                             Expanded(
-                              // sinli scrole view
-                               child: SingleChildScrollView(
-                                 child: Column(
-                                  children: [
-
-                                       GestureDetector(
-                                       onTap: () {
-                                       showDialog(
-                                              context: context, builder: ((context) => 
-                                          AlertDialog(
-                                            title: Text("Ajouter le Manager name ",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 19
-                                            ),),
-                                            content: SingleChildScrollView(
-                                              child: Form(
-                                                key: managerkey,
-                                                child: Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    CustomerForm(
-                                                      label: 'Manager name',
-                                                      textController: managerName,
-                                                      validation: (value) => value == null || value.isEmpty? 'Le champs est requis' : null,
-                                                    ),
-                                                    SizedBox(height: 4.h),
-                                                    Text("Voullez vous apporter des modification ? ",
-                                                      style: GoogleFonts.poppins(
-                                                        fontSize: 18
-                                                ),),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: (){
-                                                  Navigator.pop(context);
-                                                   setState(() {
-                                                     managerName.clear();
-                                                   });
-                                                },
-                                                child: const Text("Proceed")
-                                                ),
-                                                                           
-                                              TextButton(
-                                                onPressed: (){
-                                                  if(managerkey.currentState!.validate()){
-                                                       setState(() {
-                                                    Navigator.of(context).pop();
-                                                  });            
-                                                  }
-                                                },
-                                                child: const Text("Yes")
-                                                )  
-                                            ],
-                                          )
-                                                                           
-                                          )
-                                          );     
-                                                          
-                                          },
-                                       child: Container(
-                                        margin: EdgeInsets.only(left: 5.sp),
-                                        child: Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                managerName.text.isEmpty?
-                                                   'Manager name'
-                                                :  managerName.text
-                                                ,
-                                                style: GoogleFonts.poppins(fontSize: 20.sp)
-                                                ),
-                                                 SizedBox(width: 3.w),
-                                                 managerName.text.isEmpty?
-                                                 Icon(CupertinoIcons.pen,color: MyColors.grey,)
-                                                 : Container()
-
-                                              
-                                            ],
-                                          ),
-                                        ),
-                                        ),
-                                      ),
+                          
+                        ],
+                      ),
+                    ),
+                    ),
+                  ),
+                        
+                    SizedBox(height: 4.h),
                                            
-                                    SizedBox(height: 4.sp),
-                                           
-                                    GestureDetector(
+                    GestureDetector(
                                       onTap:() {
                                            showDialog(context: context, builder: ((context) => 
                                           AlertDialog(
@@ -414,10 +422,18 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       ),
                                     ),
 
-                                    SizedBox(height: 5.h),
+
+                          ],
+                        )
+                      ],
+                    ),
+              
+
+                   
+                    SizedBox(height: 5.h),
                                            
                                            
-                                 Row(
+                     Row(
                                  mainAxisAlignment: MainAxisAlignment.center,
                                  children: [
                                  GestureDetector(
@@ -495,10 +511,10 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                           Container(
                                             padding: EdgeInsets.all(9.sp),
                                             decoration: BoxDecoration(
-                                              color: MyColors.black12.withOpacity(0.3),
+                                              color: MyColors.grey,
                                              borderRadius: BorderRadius.circular(5.sp)
                                             ),
-                                            child: Icon(Icons.phone) ,
+                                            child: const Icon(Icons.phone) ,
                                           ),
                                           SizedBox(
                                             height: 5.h,
@@ -588,10 +604,10 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                           Container(
                                             padding: EdgeInsets.all(9.sp),
                                             decoration: BoxDecoration(
-                                              color: MyColors.black12.withOpacity(0.3),
+                                              color: MyColors.grey,
                                              borderRadius: BorderRadius.circular(5.sp)
                                             ),
-                                            child: Icon(Icons.email) ,
+                                            child: const Icon(Icons.email) ,
                                           ),
                                           SizedBox(
                                             height: 5.h,
@@ -666,10 +682,10 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                           Container(
                                             padding: EdgeInsets.all(9.sp),
                                             decoration: BoxDecoration(
-                                              color: MyColors.black12.withOpacity(0.3),
+                                              color: MyColors.grey,
                                              borderRadius: BorderRadius.circular(5.sp)
                                             ),
-                                            child: Icon(Icons.place_sharp) ,
+                                            child: const Icon(Icons.place_sharp) ,
                                           ),
                                           SizedBox(
                                             height: 5.h,
@@ -686,9 +702,9 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                        ],
                                     ),
 
-                                   const  SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                                                          
-                                  GestureDetector(
+                     GestureDetector(
                                     onTap: () {
                                      showDialog(context: context, builder: ((context) => 
                                           AlertDialog(
@@ -759,44 +775,50 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                         ),),
                                       
                                       
-                                      SizedBox(
-                                        height: 14.h,
-                                        ),
-                                      Container(
-                                        padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                          SizedBox(
-                                              width: MediaQuery.sizeOf(context).width/2,
-                                              child:  Text(
-                                                  desciption.text.isEmpty?
-                                                  "Description"
-                                                  :desciption.text,
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 16.sp
-                                                ),
-                                                  textAlign: TextAlign.start,
-                                                  )
-                                            ),
-                                        
-                                          Expanded(
-                                            child: SvgPicture.asset(AssetsFile.socialMediasvg,
-                                            width: MediaQuery.sizeOf(context).width/2,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                 ),
-                               ),
-                             )    
-                              ],
+                    SizedBox(
+                      height: 14.h,
                       ),
+                    Container(
+                            padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                              SizedBox(
+                                  width: MediaQuery.sizeOf(context).width/2,
+                                  child:   SingleChildScrollView(
+                                    child:  ReadMoreText(
+                                      desciption.text,
+                                      trimLines: 3,
+                                      textAlign: TextAlign.start,
+                                      trimCollapsedText: "Show More",
+                                      trimExpandedText: "Show Less",
+                                      moreStyle: TextStyle(color: MyColors.greens),
+                                      lessStyle: TextStyle(color: MyColors.greens),
+                                      style: GoogleFonts.poppins(),
+                                      
+                                      
+                                    ),
+                              
+                                  )
+                                ),
+                            
+                              Expanded(
+                                child: SvgPicture.asset(AssetsFile.socialMediasvg,
+                                width: MediaQuery.sizeOf(context).width/2,
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                       ),
+                       ),
+                      )    
+                     ],
+                    ),
                   ),
                   ),
-                     floatingActionButton:  FloatingActionButton(
+                floatingActionButton:  FloatingActionButton(
                       backgroundColor: MyColors.greens,
                       onPressed: (){
                       
@@ -891,7 +913,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                                 preferences.setBool('isValidationDone', true);
                                         }
                                       },
-                                      child:   Text("Yes")
+                                      child:   const Text("Yes")
                                       )  
                                   ],
                                 )

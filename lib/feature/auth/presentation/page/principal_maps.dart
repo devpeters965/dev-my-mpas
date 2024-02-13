@@ -4,8 +4,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
@@ -47,6 +49,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
   Timer? _debounce;
   var client = http.Client();
   late Location location = new Location();
+  late bool showMakerInformation = false;
 
 
   // ------------------------Get One Positon
@@ -116,6 +119,8 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                  isSearchInformation = false;
               });
               print('------------------- isSearch: $toogleSearchBar');
+              print('------------------- isSearch: $isSearchInformation');
+
           } 
           if(searcResulat.isEmpty){
             const Text("aucune valeur");
@@ -138,58 +143,56 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
           children: [
             mySearchBar ?
             TextFormField(
-                          controller: _searchController,
-                              focusNode: _focusNode,
-                              decoration:  InputDecoration(
-                                hintText: 'Rechercher une commune',
-                                prefixIcon:  const Icon(
-                                  Icons.map_rounded,
-                                  color: Colors.black12),
-                                isDense: true,
-                                border: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white,),
-                                ),
-                                fillColor: MyColors.grey,
-                                filled: true
-                              ),
-                              onEditingComplete: () {
-                              },
-                              onChanged: (String value) async{
-                                seachStudio(value); 
-                          
-                                if (_debounce?.isActive ?? false)
-                                  _debounce?.cancel();
-                                _debounce =
-                                    Timer(
-                                      const Duration(milliseconds: 2000),
-                                        () async {
-                                  var client = http.Client();
-                                  try {
-                                    String url =
-                                        'https://nominatim.openstreetmap.org/search?countrycodes=CI&q=$value&format=json&polygon_geojson=1&addressdetails=1';
-                                    var response =
-                                        await client.get(Uri.parse(url));
-                                    var decodedResponse = jsonDecode(
-                                            utf8.decode(response.bodyBytes)) as List<dynamic>;
-                                            print('----------------api response    $decodedResponse');
-                                    _options = decodedResponse
-                                        .map((e) => OSMdata(
-                                            displayname: e['display_name'],
-                                            lat: double.parse(e['lat']),
-                                            lon: double.parse(e['lon'])))
-                                        .toList();             
-                                    _options.forEach((element) {
-                                      position =
-                                          LatLng(element.lat, element.lon);
-                                        print('----------------api latitude   ${element.lat}'); 
-                                    });
-                                    setState(() {});
-                                  } finally {
-                                    client.close();
-                                  }
-                                  setState(() {});
-                                });
-                              })
+                controller: _searchController,
+                    focusNode: _focusNode,
+                    decoration:  InputDecoration(
+                      hintText: 'Rechercher une commune',
+                      prefixIcon:  const Icon(
+                        Icons.map_rounded,
+                        color: Colors.black12),
+                      isDense: true,
+                      border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white,),
+                      ),
+                      fillColor: MyColors.grey,
+                      filled: true
+                    ),
+                    onChanged: (String value) async{
+                      seachStudio(value); 
+                
+                      if (_debounce?.isActive ?? false)
+                        _debounce?.cancel();
+                      _debounce =
+                          Timer(
+                            const Duration(milliseconds: 2000),
+                              () async {
+                        var client = http.Client();
+                        try {
+                          String url =
+                              'https://nominatim.openstreetmap.org/search?countrycodes=CI&q=$value&format=json&polygon_geojson=1&addressdetails=1';
+                          var response =
+                              await client.get(Uri.parse(url));
+                          var decodedResponse = jsonDecode(
+                                  utf8.decode(response.bodyBytes)) as List<dynamic>;
+                                  print('----------------api response    $decodedResponse');
+                          _options = decodedResponse
+                              .map((e) => OSMdata(
+                                  displayname: e['display_name'],
+                                  lat: double.parse(e['lat']),
+                                  lon: double.parse(e['lon'])))
+                              .toList();             
+                          _options.forEach((element) {
+                            position =
+                                LatLng(element.lat, element.lon);
+                              print('----------------api latitude   ${element.lat}'); 
+                          });
+                          setState(() {});
+                        } finally {
+                          client.close();
+                        }
+                        setState(() {});
+                      });
+                    })
             : Container(),
             const SizedBox(height: 10,)
           ],
@@ -249,7 +252,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
 
             // ------------------- Take All GeoPoint From By Marker FB
               for (DocumentSnapshot document in snapshot.data!.docs) {
-                final title = document["bussinessNames"];
+                final title = document["managerNames"];
                 GeoPoint coordonnee = document['latitude'];
                 double latitudes = coordonnee.latitude;
                 double longitudes = coordonnee.longitude;
@@ -257,26 +260,64 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                   height: 100,
                   width: 50,
                 point: LatLng(latitudes, longitudes),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context)=>
-                    DetailView(item: document, isSearchToggle: toogleSearchBar)
-                    ));
-                  },
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(5),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(context: context, builder: ((context) => 
+                                          AlertDialog(
+                                            title:  Column(
+                                                // mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  ListTile(
+                                                    title: Text( document['managerNames']?? '' ,style:  GoogleFonts.poppins(fontSize: 9.sp, color: Colors.black),),
+                                                    subtitle: Text(  document['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 9.sp),),
+                                                    leading:   CircleAvatar(
+                                                        child:  
+                                                          ClipOval(
+                                                          child: Image.network( document['images'],
+                                                          height: MediaQuery.sizeOf(context).height,
+                                                          width:  MediaQuery.sizeOf(context).width,
+                                                          ),
+                                                        ),
+                                                      ), 
+                                                      trailing: IconButton(
+                                                        onPressed: (){
+                                                            Navigator.push(context, MaterialPageRoute(
+                                                              builder: (context)=>
+                                                            DetailView(item: document, isSearchToggle: toogleSearchBar)
+                                                            ));
+                                                        }, icon: Icon(CupertinoIcons.arrow_right_circle_fill),
+                                                  ),
+                                                  ),
+                                                ],
+                                                
+                                              ),
+                                          )
+                                      
+                                          )
+                                          );
+                      
+                       
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
                         decoration: const BoxDecoration(
                           color: Colors.white
                         ),
-                        child: Text(title,style: GoogleFonts.poppins(color: MyColors.black,fontSize: 10),),
-                      ),
-                      const SizedBox(height:4),
-                      const Icon(Icons.place,color: Colors.red,),
-                    ],
-                  ),
+                        child: Column(
+                          children: [
+                            Text(title,style: GoogleFonts.poppins(color: MyColors.black,fontSize: 8.h),
+                            textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    ),
+                
+                    const SizedBox(height:4),
+                    const Icon(Icons.place,color: Colors.red,),
+                  ],
                 ));
                 markers.add(marker);
               }
@@ -332,8 +373,8 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                          _searchController.value.text.contains(users["communes"])?
 
                                         GestureDetector(
-                                          onTap: () async{
-                                            await  Navigator.push(context, MaterialPageRoute(builder: (context)=>  
+                                          onTap: () {
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>  
                                               DetailView(search: users,  isSearchToggle: isSearchInformation))); 
                                           },
                                           child: Container(
@@ -369,20 +410,20 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [ 
-                                                        Text( users['communes']?? '' ,style:  GoogleFonts.poppins(color: Colors.black),),
-                                                         Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(color: Colors.black),),
+                                                        Text( users['communes']?? '' ,style:  GoogleFonts.poppins(fontSize: 10.sp, color: Colors.black),),
+                                                         Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 10.sp,color: Colors.black),),
                                                         RichText(text: TextSpan(
                                                           children: [
                                                              TextSpan(
                                                               text: users['phone'],
-                                                              style:  GoogleFonts.poppins(color: MyColors.black)
+                                                              style:  GoogleFonts.poppins(fontSize: 10.sp,color: MyColors.black)
                                                             ),
                                                           ]
                                                         ))
                                                   ],
                                                   ),
                                                 )
-                                              ],
+                                              ], 
                                             ),
                                             ],
                                             ),
@@ -392,8 +433,6 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                       ],
                                     );
                                    })
-
-                        
                          )
                          ),
 
@@ -415,7 +454,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                             setState(() {});
                           });
                         },
-                        child: const Icon(Icons.zoom_in_map),
+                        child: const Icon(CupertinoIcons.add),
                       )),
 
                          // ---------------------------- zoom out  
@@ -434,7 +473,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                 setState(() {});
                               });
                             },
-                            child: const Icon(Icons.zoom_out_map),
+                            child: const Icon(CupertinoIcons.minus),
                           )),
 
                         // ----------------------------- Get My Position

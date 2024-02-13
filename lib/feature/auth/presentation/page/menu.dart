@@ -41,29 +41,23 @@ class _UserMenuState extends State<UserMenu> {
   Widget build(BuildContext context) {
     final _controller = Get.put(LoginController());
     late  UserModel userItem ;
-    
-    
 
 
     return Drawer(
       child:ListView(
         padding: EdgeInsets.zero,
         children: [
-
-          // isCreateCompte == true  ?
-
             Column(
             children: [
               Container(
                 color: Colors.black,
                   height: MediaQuery.sizeOf(context).height/4.h,
+                  padding: EdgeInsets.all(1.h),
+                  alignment: Alignment.bottomCenter,
                    child: StreamBuilder<List<UserModel>?>(
                     stream:  LocatData().allEdit(),
                       builder: (context , snapshort){
                        if(snapshort.connectionState == ConnectionState.waiting){
-                          setState(() {
-                          // isCreateCompte == false;
-                        });
                          print("-------- data isSvace into local db ");
                          return SizedBox(
                           height: MediaQuery.sizeOf(context).height,
@@ -78,27 +72,25 @@ class _UserMenuState extends State<UserMenu> {
                           ),
                          );
                        }
-
             
                        if(!snapshort.hasData){
-                      
                          return Container(
-                          color: Colors.white,
+                          // color: Colors.white,
                           child:  Column(
                             children: [
-                                   UserAccountsDrawerHeader(
-                                          accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
-                                          accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
-                                          currentAccountPicture: CircleAvatar(
-                                            child: ClipOval(
-                                              child: Image.file(File(userItem.images,),
-                                                fit: BoxFit.cover,width:90, height: 90 
-                                                )   ),    
-                                             ),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.black,
-                                          ),
-                                          ) 
+                              UserAccountsDrawerHeader(
+                                    accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                    accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                    currentAccountPicture: CircleAvatar(
+                                      child: ClipOval(
+                                        child: Image.file(File(userItem.images,),
+                                          fit: BoxFit.cover,width:90, height: 90 
+                                          )   ),    
+                                        ),
+                                    decoration:  const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                    ) 
                             ],
                           ),
                          );
@@ -109,28 +101,31 @@ class _UserMenuState extends State<UserMenu> {
                    
                        return ListView.builder(
                          itemCount: userInfo!.length,
+                         physics: const NeverScrollableScrollPhysics(parent: NeverScrollableScrollPhysics()),
                          itemBuilder: (context, index){
-
-                      
-
-                            userItem = userInfo[index];
-                           print('-------------my image ${userItem.images}');
+                          userItem = userInfo[index];
+                          print('-------------my image ${userItem.images}');
                            
                          return Column(
                          children: [
                             userItem.images.isNotEmpty?
-                              UserAccountsDrawerHeader(
-                              accountName:  Text(_controller.googleAccount.value?.displayName?? userItem.managerNames,style: GoogleFonts.poppins(fontSize: 12.sp),),
-                              accountEmail: Text(_controller.googleAccount.value?.email?? userItem.email,style: GoogleFonts.poppins(fontSize: 12.sp),),
-                              currentAccountPicture: CircleAvatar(
-                                child: ClipOval(
-                                  child: Image.file(File(userItem.images,),
-                                    fit: BoxFit.cover,width:90, height: 90 
-                                    )   ),    
-                                  ),
-                              decoration: const BoxDecoration(
-                                color: Colors.black,
-                              ),
+                              Container(
+                                height: MediaQuery.sizeOf(context).height/4.h,
+                                child: UserAccountsDrawerHeader(
+                                accountName:  Text(_controller.googleAccount.value?.displayName?? userItem.managerNames,style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                accountEmail: Text(_controller.googleAccount.value?.email?? userItem.email,style: GoogleFonts.poppins(fontSize: 12.sp),),
+                                currentAccountPicture: CircleAvatar(
+                                  child: ClipOval(
+                                    child: Image.file(File(userItem.images,),
+                                      fit: BoxFit.cover,width:90, height: 90 
+                                      )   ),    
+                                    ),
+                                 arrowColor: Colors.transparent,   
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  
+                                ),
+                                ),
                               ) 
                             :
                               SvgPicture.asset("assets/icons/Online world-cuate.svg", fit: BoxFit.cover,width:90, height: 90 ),
@@ -139,27 +134,9 @@ class _UserMenuState extends State<UserMenu> {
                        });
                          })
                   ),
-         
-            ],  ),
+            ], 
+          ),
 
-          //   :
-
-          // UserAccountsDrawerHeader(
-          //   accountName:  Text(_controller.googleAccount.value?.displayName?? 'sdkfld',style: GoogleFonts.poppins(fontSize: 12.sp),),
-          //   accountEmail: Text(_controller.googleAccount.value?.email?? 'sdlkfsjhdf',style: GoogleFonts.poppins(fontSize: 12.sp),),
-          //   currentAccountPicture: CircleAvatar(
-          //     child: ClipOval(
-          //       child: SvgPicture.asset(AssetsFile.thinksSvg, fit: BoxFit.cover,width:90, height: 90 ),
-                  
-          //         )   ),    
-          //       ),
-                
-          //  Container(),
-                                      
-
-
-        
-        
              ListTile(
               title: const Text('Home'),
               leading:  Icon(CupertinoIcons.home,color: Colors.teal.shade300,),

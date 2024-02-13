@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:readmore/readmore.dart';
 import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
@@ -155,6 +156,7 @@ class _MyProfileState extends State<MyProfile> {
                         height: MediaQuery.sizeOf(context).height,
                         width: MediaQuery.sizeOf(context).width,
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                            CircularProgressIndicator(
                             color: MyColors.greens,
@@ -187,6 +189,7 @@ class _MyProfileState extends State<MyProfile> {
                          print('-------------my image ${userItem.images}');
                        return Column(
                        children: [
+                        const  SizedBox(height: 10),
           
                                Align(
                                   alignment: Alignment.center,
@@ -195,12 +198,21 @@ class _MyProfileState extends State<MyProfile> {
                                       userItem.images.isNotEmpty?
           
                                       Container(
+                                        height: MediaQuery.sizeOf(context).height/4.h,
+                                        width: MediaQuery.sizeOf(context).width/2.w,
                                             decoration: const BoxDecoration(
                                               // color: Colors.red,
                                               shape: BoxShape.circle
                                             ),
-                                        child: ClipRRect(
-                                        child: Image.file(File(userItem.images))),
+                                        child: CircleAvatar(
+                                          child: ClipOval(
+                                          child: Image.file(File(userItem.images),
+                                           height: MediaQuery.sizeOf(context).height.h,
+                                           width: MediaQuery.sizeOf(context).width.w,
+                                           fit: BoxFit.cover,
+
+                                          )),
+                                        ),
                                        )
           
                                       :
@@ -213,65 +225,60 @@ class _MyProfileState extends State<MyProfile> {
                                             ),
                                         child: SvgPicture.asset("assets/icons/Online world-cuate.svg"),
                                       ),
-          
-                                    // Positioned(
-                                    //   bottom: 9.h,
-                                    //   right: 10.h,
-                                    //   // left: 10.h,
-                                    //   child: Align(
-                                    //     alignment: const Alignment(0.3, 0.5 ),
-                                    //     child: Container(
-                                    //       decoration: BoxDecoration(
-                                    //         color: MyColors.greens,
-                                    //         shape: BoxShape.circle
-                                    //       ),
-                                    //       child: IconButton(
-                                    //               onPressed: (){
-                                    //                 selectImages();
-                                    //               }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
-                                    //     ),),
-                                    // )
                                     ]
                                   )
                                 ),
-          
-                         GestureDetector(
-                           child: Container(
-                             margin: EdgeInsets.only(left: 5.sp),
-                             child: Align(
-                               alignment: Alignment.topLeft,
-                               child: Text(
-                                 userItem.managerNames.isNotEmpty?
-                                 userItem.managerNames
-                                : "Info non valide",
-                                 style: GoogleFonts.poppins(fontSize: 20.sp)
-                                 ),
-                             ),
-                           ),
-                         ),
-                 
-                         SizedBox(height: 4.sp),
-                 
-                         SizedBox(
-                           child: GestureDetector(
-                             child: Container(
-                               margin: EdgeInsets.only(left: 5.sp),
-                               child: Align(
-                                 alignment: Alignment.topLeft,
-                                 child: Text(
-                                  userItem.bussiness.isNotEmpty?
-                                   userItem.bussiness
-                                  : "Aucune Activé",
+                      
 
-                                   style: GoogleFonts.poppins(fontSize: 20.sp)
-                                   ),
+                          SizedBox(height: 10.h),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                children: [
+                                    GestureDetector(
+                               child: Container(
+                                 margin: EdgeInsets.only(left: 5.sp),
+                                 child: Align(
+                                   alignment: Alignment.topLeft,
+                                   child: Text(
+                                     userItem.managerNames.isNotEmpty?
+                                     userItem.managerNames
+                                    : "Info non valide",
+                                     style: GoogleFonts.poppins(fontSize: 20.sp)
+                                     ),
+                                 ),
                                ),
-                             ),
-                           ),
-                         ),
+                                                       ),
+                                               
+                                                      
+                                               
+                                                       SizedBox(
+                               child: GestureDetector(
+                                 child: Container(
+                                   margin: EdgeInsets.only(left: 5.sp),
+                                   child: Align(
+                                     alignment: Alignment.topLeft,
+                                     child: Text(
+                                      userItem.bussiness.isNotEmpty?
+                                       userItem.bussiness
+                                      : "Aucune Activé",
+                              
+                                       style: GoogleFonts.poppins(fontSize: 20.sp)
+                                       ),
+                                   ),
+                                 ),
+                               ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                       
                  
-                 
-                           Row(
+                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                      children: [
                       GestureDetector(                           
@@ -282,7 +289,7 @@ class _MyProfileState extends State<MyProfile> {
                                Container(
                                  padding: EdgeInsets.all(9.sp),
                                  decoration: BoxDecoration(
-                                   color: MyColors.black12.withOpacity(0.3),
+                                   color: MyColors.grey,
                                   borderRadius: BorderRadius.circular(5.sp)
                                  ),
                                  child: const Icon(Icons.phone) ,
@@ -310,7 +317,7 @@ class _MyProfileState extends State<MyProfile> {
                                Container(
                                  padding: EdgeInsets.all(9.sp),
                                  decoration: BoxDecoration(
-                                   color: MyColors.black12.withOpacity(0.3),
+                                   color: MyColors.grey,
                                   borderRadius: BorderRadius.circular(5.sp)
                                  ),
                                  child: const Icon(Icons.email) ,
@@ -320,7 +327,7 @@ class _MyProfileState extends State<MyProfile> {
                                ),
                                Text(userItem.email.isNotEmpty?
                                 userItem.email
-                               : 'adresse email invalide'
+                               : 'email invalide'
                                ,
                                style: GoogleFonts.poppins(
                                  fontSize: 11.sp
@@ -339,7 +346,7 @@ class _MyProfileState extends State<MyProfile> {
                                Container(
                                  padding: EdgeInsets.all(9.sp),
                                  decoration: BoxDecoration(
-                                   color: MyColors.black12.withOpacity(0.3),
+                                   color: MyColors.grey,
                                   borderRadius: BorderRadius.circular(5.sp)
                                  ),
                                  child: const Icon(Icons.place_sharp) ,
@@ -347,9 +354,11 @@ class _MyProfileState extends State<MyProfile> {
                                SizedBox(
                                  height: 5.h,
                                ),
-                               Text(userItem.commune.isNotEmpty?
-                                 userItem.commune
-                               : 'aucune commune',
+                               Text(userItem.commune == "Abidjan" ?
+                                'aucune commune'
+                                :
+                                 userItem.commune ,
+                              //  : 'aucune commune',
                                 
                                style: GoogleFonts.poppins(
                                  fontSize: 11.sp
@@ -361,6 +370,8 @@ class _MyProfileState extends State<MyProfile> {
                    
                    ],
                  ),
+
+                 SizedBox(height: 10.h),
                  
                  GestureDetector(
                    child: Text('description',
@@ -380,14 +391,18 @@ class _MyProfileState extends State<MyProfile> {
                      children: [
                         SizedBox(
                            width: MediaQuery.sizeOf(context).width/2,
-                           child:  Text(
-                             userItem.desciption
-                             ,
-                             style: GoogleFonts.poppins(
-                               fontSize: 16.sp
-                             ),
-                               textAlign: TextAlign.start,
-                               )
+                           child:  SingleChildScrollView(
+                                      child:  ReadMoreText(
+                                        userItem.desciption,
+                                        trimLines: 3,
+                                        textAlign: TextAlign.start,
+                                        trimCollapsedText: "Show More",
+                                        trimExpandedText: "Show Less",
+                                        moreStyle: TextStyle(color: MyColors.greens),
+                                        lessStyle: TextStyle(color: MyColors.greens),
+                                        style: GoogleFonts.poppins(),
+                                      ),
+                                    )
                          ),
                        Expanded(
                          child: SvgPicture.asset(AssetsFile.socialMediasvg,
