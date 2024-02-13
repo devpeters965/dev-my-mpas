@@ -46,7 +46,6 @@ class _ProfileViewFlowState extends State<ProfileViewFlow> {
         if (!snapshot.hasData) {
              print("============= take to regitrer logine");
              AutomateNavigator.getScreen(2,context,  const  CreateLocalCompte(rowBackEditProfile: false,));
-            // Navigator.push(context, MaterialPageRoute(builder: (context)=> CreateLocalCompte(rowBackEditProfile: false,)));
           
         }{
            

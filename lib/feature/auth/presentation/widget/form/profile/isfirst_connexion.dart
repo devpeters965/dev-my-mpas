@@ -213,7 +213,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                             )
                           :
 
-                            Container(
+                        Container(
                               height: MediaQuery.sizeOf(context).height/4.h,
                              width: MediaQuery.sizeOf(context).width/2.w,
                               decoration: const BoxDecoration(
@@ -222,15 +222,17 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                 ),
                                 child: CircleAvatar(
                                   // radius: 1,
+                                  backgroundColor: Colors.white,
                                   child: ClipOval(
                                     child: Image.file(File(_imgesProile),
-                                    height: MediaQuery.sizeOf(context).height.h,
-                                    width: MediaQuery.sizeOf(context).width.w,
+                                    height: MediaQuery.sizeOf(context).height/2.h,
+                                    width: MediaQuery.sizeOf(context).width/2.w,
                                     fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                                ),
+                             ),
+                             
                         Positioned(
                           bottom: 2.h,
                           right: 0.h,
@@ -248,11 +250,11 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       }, icon: const Icon(Icons.camera_alt,color: Colors.white,)),
                             ),),
                         )
-                        ]
+                       ]
                       )
                     ),
 
-                    SizedBox(height: 9.h),
+                    SizedBox(height: 15.h),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

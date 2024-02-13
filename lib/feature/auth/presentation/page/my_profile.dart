@@ -201,14 +201,14 @@ class _MyProfileState extends State<MyProfile> {
                                         height: MediaQuery.sizeOf(context).height/4.h,
                                         width: MediaQuery.sizeOf(context).width/2.w,
                                             decoration: const BoxDecoration(
-                                              // color: Colors.red,
-                                              shape: BoxShape.circle
+                                              // shape: BoxShape.circle
                                             ),
                                         child: CircleAvatar(
+                                          radius: 100,
                                           child: ClipOval(
                                           child: Image.file(File(userItem.images),
-                                           height: MediaQuery.sizeOf(context).height.h,
-                                           width: MediaQuery.sizeOf(context).width.w,
+                                           height: MediaQuery.sizeOf(context).height/2.h,
+                                           width: MediaQuery.sizeOf(context).width/2.w,
                                            fit: BoxFit.cover,
 
                                           )),
@@ -230,7 +230,7 @@ class _MyProfileState extends State<MyProfile> {
                                 ),
                       
 
-                          SizedBox(height: 10.h),
+                          SizedBox(height: 15.h),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

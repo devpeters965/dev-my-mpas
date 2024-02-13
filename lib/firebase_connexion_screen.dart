@@ -4,7 +4,6 @@ import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:isar/isar.dart';
 import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
 
@@ -29,13 +28,7 @@ class AuthGate extends StatelessWidget {
               iOSPreferPlist: true
               ),  // new
            ],
-           headerBuilder: (context, constraints, shrinkOffset) {
-            
-             return Padding(
-               padding: const EdgeInsets.all(20),
-               child: SvgPicture.asset(AssetsFile.assetsLoginSvg)
-             );
-           },
+        
            subtitleBuilder: (context, action) {
              return Padding(
                padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -46,20 +39,14 @@ class AuthGate extends StatelessWidget {
            },
            footerBuilder: (context, action) {
              return  Padding(
-               padding: EdgeInsets.only(top: 16),
+               padding: const EdgeInsets.only(top: 16),
                child: Text(
                  'By signing in, you agree to our terms and conditions.',
                  style: GoogleFonts.poppins(color: Colors.grey),
                ),
              );
            },
-          //  sideBuilder: (context, shrinkOffset) {
-          //    return Padding(
-          //      padding: const EdgeInsets.all(20),
-          //      child: SvgPicture.asset("assets/icons/Personal site-pana.svg")
-               
-          //    );
-          //  },
+      
          );
        }
 

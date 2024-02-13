@@ -14,6 +14,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:real_track/config/theme/style.dart';
+import 'package:real_track/core/animation/slade_effect.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
 import 'package:real_track/feature/auth/presentation/page/detail_view.dart';
 import 'package:real_track/feature/auth/presentation/page/menu.dart';
@@ -270,8 +271,8 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                                 // mainAxisSize: MainAxisSize.max,
                                                 children: [
                                                   ListTile(
-                                                    title: Text( document['managerNames']?? '' ,style:  GoogleFonts.poppins(fontSize: 9.sp, color: Colors.black),),
-                                                    subtitle: Text(  document['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 9.sp),),
+                                                    title: Text( document['managerNames']?? '' ,style:  GoogleFonts.poppins(fontSize: 11.sp, color: Colors.black),),
+                                                    subtitle: Text(  document['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 11.sp),),
                                                     leading:   CircleAvatar(
                                                         child:  
                                                           ClipOval(
@@ -372,63 +373,67 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
                                         
                                          _searchController.value.text.contains(users["communes"])?
 
-                                        GestureDetector(
-                                          onTap: () {
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>  
-                                              DetailView(search: users,  isSearchToggle: isSearchInformation))); 
-                                          },
-                                          child: Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(5)
-                                              ),
-                                            child: Column(
-                                                children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.all(5),
-                                                  decoration:  BoxDecoration(
-                                                    color:  ('${users['images']}'.isNotEmpty)? Colors.transparent :  Colors.black12,
-                                                    shape: BoxShape.circle
-                                                  ),
-                                                  child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(5),
-                                                    child: ('${users['images']}'.isNotEmpty)?
-                                                     Image.network(
-                                                       users['images'],
-                                                       height: MediaQuery.sizeOf(context).height/15 ,
-                                                    )
-                                                    : SvgPicture.asset("assets/icons/Travelers-pana.svg"),
-                                                  )
+                                        SladeAnimation(
+                                          delay: 1200,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>  
+                                                DetailView(search: users,  isSearchToggle: isSearchInformation))); 
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                                              padding: const EdgeInsets.all(5),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(5)
                                                 ),
-                                                 const SizedBox(width: 10,),
-                                                Container(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [ 
-                                                        Text( users['communes']?? '' ,style:  GoogleFonts.poppins(fontSize: 10.sp, color: Colors.black),),
-                                                         Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 10.sp,color: Colors.black),),
-                                                        RichText(text: TextSpan(
-                                                          children: [
-                                                             TextSpan(
-                                                              text: users['phone'],
-                                                              style:  GoogleFonts.poppins(fontSize: 10.sp,color: MyColors.black)
-                                                            ),
-                                                          ]
-                                                        ))
-                                                  ],
+                                              child: Column(
+                                                  children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets.all(5),
+                                                    decoration:  BoxDecoration(
+                                                      color:  ('${users['images']}'.isNotEmpty)? Colors.transparent :  Colors.black12,
+                                                      shape: BoxShape.circle
+                                                    ),
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(5),
+                                                      child: ('${users['images']}'.isNotEmpty)?
+                                                       Image.network(
+                                                         users['images'],
+                                                         height: MediaQuery.sizeOf(context).height/15 ,
+                                                      )
+                                                      : SvgPicture.asset("assets/icons/Travelers-pana.svg"),
+                                                    )
                                                   ),
-                                                )
-                                              ], 
-                                            ),
-                                            ],
-                                            ),
-                                            ),
+                                                   const SizedBox(width: 10,),
+                                                  Container(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [ 
+                                                          Text( users['communes']?? '' ,style:  GoogleFonts.poppins(fontSize: 11.sp, color: Colors.black),),
+                                                           Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 11.sp,color: Colors.black),),
+                                                          RichText(text: TextSpan(
+                                                            children: [
+                                                               TextSpan(
+                                                                text: users['phone'],
+                                                                style:  GoogleFonts.poppins(fontSize: 11.sp,color: MyColors.black)
+                                                              ),
+                                                            ]
+                                                          ))
+                                                    ],
+                                                    ),
+                                                  )
+                                                ], 
+                                              ),
+                                              ],
+                                              ),
+                                              ),
+                                          ),
                                         )  
+                                       
                                         : Container()                   
                                       ],
                                     );
