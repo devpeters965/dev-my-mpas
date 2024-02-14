@@ -16,6 +16,7 @@ import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
 import 'package:real_track/core/constante/forms/customer_forms.dart';
 import 'package:real_track/core/constante/forms/customer_selected.dart';
+import 'package:real_track/core/notification/local_notification.dart';
 import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart';
 import 'package:real_track/feature/auth/data/model/user_info.dart';
 import 'package:real_track/feature/auth/domain/usercase/add_db.dart';
@@ -63,6 +64,8 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
       });
     }
   }
+
+  NotificationService localPushNotification = NotificationService();
 
   final formkey = GlobalKey<FormState>();
 
@@ -878,12 +881,12 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                              setState(() {
                                              isSelectImage = false;
                                           });
+                                          
                                         }
 
                                         if(informaton == "Modifier"){
                                         
                                            Navigator.of(context).pop();
-                                     
                                         }
                                         }, child: const Text("Ok"))
                                     :  
@@ -901,8 +904,9 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                                    // ignore: use_build_context_synchronously
                                                    Navigator.push(context, MaterialPageRoute(builder: ((context) => 
                                                    MyProfile())));
+                                                   localPushNotification.showNotification(title: "Studio track", body: "Votre compte a été crée avec success!");
                                         }
-                                                     if(informaton == "Modifier"){
+                                         if(informaton == "Modifier"){
                                           
                                                    UserCase.usercase.updateUserInfo(userUpdate);
                                                     AddUser().upLoadData(_image!);
@@ -913,6 +917,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
 
                                               SharedPreferences preferences = await  SharedPreferences.getInstance();
                                                 preferences.setBool('isValidationDone', true);
+                                                localPushNotification.showNotification(title: "Studio track", body: "Votre profile a été modifié avec success!");
                                         }
                                       },
                                       child:   const Text("Yes")

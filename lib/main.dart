@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:real_track/core/notification/local_notification.dart';
+import 'package:real_track/core/notification/push_notification.dart';
 import 'package:real_track/feature/auth/data/data_resource/local/local_data.dart';
 import 'package:real_track/feature/auth/domain/usercase/check_service_map_state.dart';
 import 'package:real_track/firebase_connexion_screen.dart';
@@ -10,6 +12,8 @@ import 'package:real_track/firebase_connexion_screen.dart';
  Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
    await Firebase.initializeApp();
+   NotificationPush.initPushNotification();
+   NotificationService().initNotification();
    defaultPosition(); 
    LocatData().db;
    await Hive.initFlutter();
