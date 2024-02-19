@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:real_track/feature/auth/data/model/user_info.dart';
+import 'package:real_track/feature/auth/domain/entities/google_entities.dart';
 import 'package:real_track/feature/auth/domain/respository/entities_repository.dart';
+// import 'package:real_track/feature/auth/data/model/user_info.dart';
+// import 'package:real_track/feature/auth/domain/respository/entities_repository.dart';
 
-class LocalService implements RepositoryUserIfo{
+class LocalService  implements RepositoryUserIfon {
  late Future<Isar> db;
 
  LocalService(){
   db = openDB();
  }
-
-
 
   // open db
   Future<Isar> openDB()async{
@@ -25,8 +26,7 @@ class LocalService implements RepositoryUserIfo{
     return Future.value(Isar.getInstance()); 
   }
   
-
-  // add user
+  //  add user
   @override
   Future<void> addUserInfo(UserModel userModel)async {
     final isar = await openDB();
@@ -58,6 +58,46 @@ class LocalService implements RepositoryUserIfo{
   
   }
 
- 
-
 }
+
+// ------------------------------------- Google Authen information 
+
+class LocalServiceGoogle implements RepositoryGoogleAuthEntities{
+    
+   late Future<Isar> dbg ;
+
+    LocalServiceGoogle(){
+      dbg = openDB();
+    }
+
+  Future<Isar> openDB()async{
+    if(Isar.instanceNames.isEmpty){
+       final  dir = await getApplicationDocumentsDirectory();
+       final isar = await Isar.open([GoogleEntitesSchema], directory: dir.path);
+       return isar;
+    }
+    return Future.value(Isar.getInstance());
+  }
+
+
+  // add google info
+  @override
+  Future<void> addUserGoogleInfo(GoogleEntites googleEntites) async{
+    final isar = await dbg;
+      isar.writeTxnSync(() => isar.googleEntites.putSync(googleEntites));
+   
+  }
+
+  @override
+  Stream<List<GoogleEntites>> getUserAuthInfo()async* {
+    final db = await dbg;
+    yield* db.googleEntites.where().watch(fireImmediately: true);
+  }
+  
+}
+
+
+
+
+
+

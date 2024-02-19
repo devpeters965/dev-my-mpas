@@ -54,11 +54,7 @@ class _SignUpState extends State<SignUp> {
                           child: Text("Validation", style: GoogleFonts.poppins(fontSize: 17.sp),) ,
                         ),
                       ),
-                    )
-          
-                  
-          
-                              
+                    )          
                   ],
                 ),
               ),

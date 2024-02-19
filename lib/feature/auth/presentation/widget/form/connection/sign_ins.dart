@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/config/theme/style.dart';
-import 'package:real_track/feature/auth/data/data_resource/remote/firebase_data.dart';
+import 'package:real_track/feature/auth/data/data_resource/remote/serice/serice_google_auth.dart';
 
 class GoogleSignInScreen extends StatefulWidget {
   const GoogleSignInScreen({Key? key}) : super(key: key);

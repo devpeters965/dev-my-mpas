@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:real_track/config/theme/style.dart';
-import 'package:real_track/feature/auth/data/data_resource/remote/firebase_path.dart';
+import 'package:real_track/corbeille/firebase_path.dart';
 
 class CustomerProfile extends StatelessWidget {
   const CustomerProfile({

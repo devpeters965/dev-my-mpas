@@ -16,6 +16,7 @@ import 'package:location/location.dart';
 import 'package:real_track/config/theme/style.dart';
 import 'package:real_track/core/animation/slade_effect.dart';
 import 'package:real_track/core/constante/constant_var/const_var.dart';
+import 'package:real_track/core/notification/push_notification.dart';
 import 'package:real_track/feature/auth/presentation/page/detail_view.dart';
 import 'package:real_track/feature/auth/presentation/page/menu.dart';
 
@@ -62,7 +63,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
     var decodedResponse =
         jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
       _searchController.text = await decodedResponse['display_name'] ?? " MOVE TO CURRENT POSITION";
-    print('------------------- longitude $latitude et latitude $longitude');
+    print('------------------- current longitude $latitude et current latitude $longitude');
   }
 
 
@@ -84,6 +85,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
+    NotificationPush.initPushNotification();
     _mapController = MapController();
     setNameCurrentPosAtInit();
     _mapController.mapEventStream.listen((event) async {
@@ -112,6 +114,7 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
   // << ---------------------------- search user 
    void seachStudio(String query)async{
       final resultat = await FirebaseFirestore.instance.collection('Userinfo').where("communes", isEqualTo: query).get();
+
        searcResulat = await  resultat.docs.map((e)  =>e.data()).toList();
       setState(()  {
           if(searcResulat.isNotEmpty){
@@ -212,348 +215,397 @@ class _rincipalViewState extends State<rincipalView> with SingleTickerProviderSt
 
       // ------------------------------- App Body
 
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("Userinfo").snapshots(),
-        builder: (context, snapshot) {
-
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return Container(
-               alignment: Alignment.center,
-              child: const CircularProgressIndicator(
-                color: Colors.red,
-              ),
-            );
-          } 
-          if(!snapshot.hasData){
-            return  Center(
-              child: Column(
-                children: [
-                  Text("Aucune donnée",style: GoogleFonts.poppins(color: Colors.black, fontSize: 20),),
-                   const CircularProgressIndicator(
-                    color: Colors.red,
-                  )
-                ],
-              ),
-            );
-          }
-         if (!snapshot.hasData) {
-            return   const Column(
-              children: [
-                Text("Aucune donnee"),
-              ],
-            );
-            }
-          if(snapshot.hasData){
-             
-            //  --------------------- Extrat Data From FB
-             locations = snapshot.data!.docs.first.get("latitude");
-                 snapshot.data!.docs.forEach((data) {
-                  userData.add(data);
-              });
-
-            // ------------------- Take All GeoPoint From By Marker FB
-              for (DocumentSnapshot document in snapshot.data!.docs) {
-                final title = document["managerNames"];
-                GeoPoint coordonnee = document['latitude'];
-                double latitudes = coordonnee.latitude;
-                double longitudes = coordonnee.longitude;
-                 Marker marker = Marker(
-                  height: 100,
-                  width: 50,
-                point: LatLng(latitudes, longitudes),
+      body: WillPopScope(
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection("Userinfo").snapshots(),
+          builder: (context, snapshot) {
+        
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return Container(
+                 alignment: Alignment.center,
+                child: const CircularProgressIndicator(
+                  color: Colors.red,
+                ),
+              );
+            } 
+            if(!snapshot.hasData){
+              return  Center(
                 child: Column(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(context: context, builder: ((context) => 
-                                          AlertDialog(
-                                            title:  Column(
-                                                // mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  ListTile(
-                                                    title: Text( document['managerNames']?? '' ,style:  GoogleFonts.poppins(fontSize: 11.sp, color: Colors.black),),
-                                                    subtitle: Text(  document['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 11.sp),),
-                                                    leading:   CircleAvatar(
-                                                        child:  
-                                                          ClipOval(
-                                                          child: Image.network( document['images'],
-                                                          height: MediaQuery.sizeOf(context).height,
-                                                          width:  MediaQuery.sizeOf(context).width,
-                                                          ),
-                                                        ),
-                                                      ), 
-                                                      trailing: IconButton(
-                                                        onPressed: (){
-                                                            Navigator.push(context, MaterialPageRoute(
-                                                              builder: (context)=>
-                                                            DetailView(item: document, isSearchToggle: toogleSearchBar)
-                                                            ));
-                                                        }, icon: Icon(CupertinoIcons.arrow_right_circle_fill),
-                                                  ),
-                                                  ),
-                                                ],
-                                                
-                                              ),
-                                          )
-                                      
-                                          )
-                                          );
-                      
-                       
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.white
-                        ),
-                        child: Column(
-                          children: [
-                            Text(title,style: GoogleFonts.poppins(color: MyColors.black,fontSize: 8.h),
-                            textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      )
-                    ),
-                
-                    const SizedBox(height:4),
-                    const Icon(Icons.place,color: Colors.red,),
+                    Text("Aucune donnée",style: GoogleFonts.poppins(color: Colors.black, fontSize: 20),),
+                     const CircularProgressIndicator(
+                      color: Colors.red,
+                    )
                   ],
-                ));
-                markers.add(marker);
+                ),
+              );
+            }
+           if (!snapshot.hasData) {
+              return   const Column(
+                children: [
+                  Text("Aucune donnee"),
+                ],
+              );
               }
-          }
-
-          return Stack(
-            children: [
-          
-              // -------------------------- Maps Widget 
-                  Positioned.fill(
-                     child: FlutterMap(
-                        options: MapOptions(
-                            onTap: (tapPosition, point) {
-                               setState(()  {
-                                 position = point;
-                               });
-                            },
-                            initialCenter:
-                             position != null
-                                ? position!
-                                : 
-                            LatLng(
-                              position!.latitude,
-                              position!.longitude),
-                            zoom: 8.0,
-                            maxZoom: 18,
-                            minZoom: 6),
-                        mapController: _mapController,
-                        children: [
-                          TileLayer(
-                            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                            subdomains: const ['a', 'b', 'c'],
-                          ),
-                          MarkerLayer(markers: markers)
-                        ],
-                      )),
-
-                   // ----------------------- SubDescription Of Makers  
-                  Positioned( 
-                    bottom: 2,
-                    child: Container(
-                      height: 100,
-                      width: MediaQuery.sizeOf(context).width,
-                      margin: const EdgeInsets.symmetric(horizontal: 5,vertical: 3),
-                      child:  ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount:  toogleSearchBar? searcResulat.length : userData.length,
-                                  itemBuilder: (context, index){
-                                  final users = toogleSearchBar? searcResulat[index]: userData[index];
-                                    return    Column(
-                                      children: [
-                                        
-                                         _searchController.value.text.contains(users["communes"])?
-
-                                        SladeAnimation(
-                                          delay: 1200,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                                Navigator.push(context, MaterialPageRoute(builder: (context)=>  
-                                                DetailView(search: users,  isSearchToggle: isSearchInformation))); 
-                                            },
-                                            child: Container(
-                                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                                              padding: const EdgeInsets.all(5),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius: BorderRadius.circular(5)
-                                                ),
-                                              child: Column(
+            if(snapshot.hasData){
+               
+              //  --------------------- Extrat Data From FB
+               locations = snapshot.data!.docs.first.get("latitude");
+        
+                   snapshot.data!.docs.forEach((data) {
+                    userData.add(data);
+                });
+                
+              
+              // ------------------- Take All GeoPoint From By Marker FB
+                for (DocumentSnapshot document in snapshot.data!.docs) {
+                  final title = document["managerNames"];
+                  GeoPoint coordonnee = document['latitude'];
+                  double latitudes = coordonnee.latitude;
+                  double longitudes = coordonnee.longitude;
+                   Marker marker = Marker(
+                    height: 100,
+                    width: 50,
+                  point: LatLng(latitudes, longitudes),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(context: context, builder: ((context) => 
+                                            AlertDialog(
+                                              title:  Column(
+                                                  // mainAxisSize: MainAxisSize.max,
                                                   children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets.all(5),
-                                                    decoration:  BoxDecoration(
-                                                      color:  ('${users['images']}'.isNotEmpty)? Colors.transparent :  Colors.black12,
-                                                      shape: BoxShape.circle
+                                                    ListTile(
+                                                      title: Text( document['managerNames']?? '' ,style:  GoogleFonts.poppins(fontSize: 11.sp, color: Colors.black),),
+                                                      subtitle: Text(  document['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 11.sp),),
+                                                      leading:   CircleAvatar(
+                                                          child:  
+                                                            ClipOval(
+                                                            child: Image.network( document['images'],
+                                                            height: MediaQuery.sizeOf(context).height,
+                                                            width:  MediaQuery.sizeOf(context).width,
+                                                            ),
+                                                          ),
+                                                        ), 
+                                                        trailing: IconButton(
+                                                          onPressed: (){
+                                                              Navigator.push(context, MaterialPageRoute(
+                                                                builder: (context)=>
+                                                              DetailView(item: document, isSearchToggle: toogleSearchBar)
+                                                              ));
+                                                          }, icon: Icon(CupertinoIcons.arrow_right_circle_fill),
                                                     ),
-                                                    child: ClipRRect(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      child: ('${users['images']}'.isNotEmpty)?
-                                                       Image.network(
-                                                         users['images'],
-                                                         height: MediaQuery.sizeOf(context).height/15 ,
-                                                      )
-                                                      : SvgPicture.asset("assets/icons/Travelers-pana.svg"),
-                                                    )
-                                                  ),
-                                                   const SizedBox(width: 10,),
-                                                  Container(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [ 
-                                                          Text( users['communes']?? '' ,style:  GoogleFonts.poppins(fontSize: 11.sp, color: Colors.black),),
-                                                           Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 11.sp,color: Colors.black),),
-                                                          RichText(text: TextSpan(
-                                                            children: [
-                                                               TextSpan(
-                                                                text: users['phone'],
-                                                                style:  GoogleFonts.poppins(fontSize: 11.sp,color: MyColors.black)
-                                                              ),
-                                                            ]
-                                                          ))
-                                                    ],
                                                     ),
-                                                  )
-                                                ], 
-                                              ),
-                                              ],
-                                              ),
-                                              ),
-                                          ),
-                                        )  
-                                       
-                                        : Container()                   
-                                      ],
-                                    );
-                                   })
-                         )
-                         ),
-
-                 // ---------------------------- Zoom In
-                  Positioned(
-                      bottom: 150,
-                      right: 5,
-                      child: FloatingActionButton(
-                        heroTag: 'btn1',
-                        backgroundColor: Colors.white,
-                        onPressed: () {
-                          _mapController.move(
-                              _mapController.center, _mapController.zoom + 1);
-                          pickData().then((value) {
-                            position = LatLng(value.latLong.latitude,
-                                value.latLong.longitude);
-                            _searchController.text = value.address;
-                            
-                            setState(() {});
-                          });
+                                                  ],
+                                                  
+                                                ),
+                                            )
+                                        
+                                            )
+                                            );
+                        
+                         
                         },
-                        child: const Icon(CupertinoIcons.add),
-                      )),
-
-                         // ---------------------------- zoom out  
-                        Positioned(
-                          bottom: 90,
-                          right: 5,
-                          child: FloatingActionButton(
-                            heroTag: 'btn2',
-                            backgroundColor: Colors.white,
-                            onPressed: () {
-                              _mapController.move(
-                                  _mapController.center, _mapController.zoom - 1);
-                              pickData().then((value) {
-                                position = LatLng(value.latLong.latitude,
-                                    value.latLong.longitude);
-                                setState(() {});
-                              });
-                            },
-                            child: const Icon(CupertinoIcons.minus),
-                          )),
-
-                        // ----------------------------- Get My Position
-                        Positioned(
-                          bottom: 30,
-                          right: 5,
-                          child: FloatingActionButton(
-                            heroTag: 'btn3',
-                            backgroundColor: Colors.white,
-                            onPressed: () async {
-                              final _locationData = await location.getLocation();
-          
-                              _mapController.move(
-                                  LatLng(
-                                      _locationData.latitude ??
-                                         position!.latitude,
-                                      position!.longitude),
-                                  _mapController.zoom);
-                              setNameCurrentPos();
-                            },
-                            child: const Icon(Icons.my_location),
-                          )),
-
-                        // ----------------------------- Search Bar
-                        Positioned(
-                        top: 17,
-                        left: 0,
-                        right: 0,
                         child: Container(
-                          margin: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5),
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.white
                           ),
                           child: Column(
-                            children: [                  
-                              StatefulBuilder(builder: ((context, setState) {
-                                return ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount:
-                                        _options.length > 5 ? 5 : _options.length,
-                                    itemBuilder: (context, index) {
-                                      return ListTile(
-                                        title: Text(_options[index].displayname),
-                                        subtitle: Text(
-                                            '${_options[index].lat},${_options[index].lon}'),
-                                        onTap: () {
-                                          _mapController.move(
-                                              LatLng(_options[index].lat,
-                                                  _options[index].lon),
-                                              15.0);
-                                          pickData().then((value) {
-                                            position = LatLng(
-                                                value.latLong.latitude,
-                                                value.latLong.longitude);
-                                            _searchController.text = value.address;
-          
-                                            setState(() {});
-                                          });
-          
-                                          _focusNode.unfocus();
-                                          _options.clear();
-                                          setState(() {});
-                                        },
-                                      );
-                                    });
-                              })),
+                            children: [
+                              Text(title,style: GoogleFonts.poppins(color: MyColors.black,fontSize: 8.h),
+                              textAlign: TextAlign.center,
+                              ),
                             ],
                           ),
-                        ),
-                      ),     
-            ],
-          );
-        }
+                        )
+                      ),
+                  
+                      const SizedBox(height:4),
+                      const Icon(Icons.place,color: Colors.red,),
+                    ],
+                  ));
+                  markers.add(marker);
+                }
+            }
+        
+            return Stack(
+              children: [
+            
+                // -------------------------- Maps Widget 
+                    Positioned.fill(
+                       child: FlutterMap(
+                          options: MapOptions(
+                              onTap: (tapPosition, point) {
+                                 setState(()  {
+                                   position = point;
+                                 });
+                              },
+                              initialCenter:
+                               position != null
+                                  ? position!
+                                  : 
+                              LatLng(
+                                position!.latitude,
+                                position!.longitude),
+                              zoom: 8.0,
+                              maxZoom: 18,
+                              minZoom: 6),
+                          mapController: _mapController,
+                          children: [
+                            TileLayer(
+                              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                              subdomains: const ['a', 'b', 'c'],
+                            ),
+                            MarkerLayer(markers: markers)
+                          ],
+                        )),
+        
+                     // ----------------------- SubDescription Of Makers  
+                    Positioned( 
+                      bottom: 2,
+                      child: Container(
+                        height: 100,
+                        width: MediaQuery.sizeOf(context).width,
+                        margin: const EdgeInsets.symmetric(horizontal: 5,vertical: 3),
+                        child:  ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount:  toogleSearchBar? searcResulat.length : userData.length,
+                                    itemBuilder: (context, index){
+                                    final users = toogleSearchBar? searcResulat[index]: userData[index];
+                                    
+                                      return    Column(
+                                        children: [
+                                          
+                                           _searchController.value.text.contains(users["communes"])?
+        
+                                          SladeAnimation(
+                                            delay: 1200,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>  
+                                                  DetailView(search: users,  isSearchToggle: isSearchInformation))); 
+                                              },
+                                              child: Container(
+                                                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                                                padding: const EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(5)
+                                                  ),
+                                                child: Column(
+                                                    children: [
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.all(5),
+                                                      decoration:  BoxDecoration(
+                                                        color:  ('${users['images']}'.isNotEmpty)? Colors.transparent :  Colors.black12,
+                                                        shape: BoxShape.circle
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        child: ('${users['images']}'.isNotEmpty)?
+                                                         Image.network(
+                                                           users['images'],
+                                                           height: MediaQuery.sizeOf(context).height/15 ,
+                                                        )
+                                                        : SvgPicture.asset("assets/icons/Travelers-pana.svg"),
+                                                      )
+                                                    ),
+                                                     const SizedBox(width: 10,),
+                                                    Container(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [ 
+                                                            Text( users['communes']?? '' ,style:  GoogleFonts.poppins(fontSize: 11.sp, color: Colors.black),),
+                                                             Text(  users['bussinessNames'] ?? ''  ,style: GoogleFonts.poppins(fontSize: 11.sp,color: Colors.black),),
+                                                            RichText(text: TextSpan(
+                                                              children: [
+                                                                 TextSpan(
+                                                                  text: users['phone'],
+                                                                  style:  GoogleFonts.poppins(fontSize: 11.sp,color: MyColors.black)
+                                                                ),
+                                                              ]
+                                                            ))
+                                                      ],
+                                                      ),
+                                                    )
+                                                  ], 
+                                                ),
+                                                ],
+                                                ),
+                                                ),
+                                            ),
+                                          )  
+                                         
+                                          : Container()                   
+                                        ],
+                                      );
+                                     })
+                           )
+                           ),
+        
+                   // ---------------------------- Zoom In
+                    Positioned(
+                        bottom: 150,
+                        right: 5,
+                        child: FloatingActionButton(
+                          heroTag: 'btn1',
+                          backgroundColor: Colors.white,
+                          onPressed: () {
+                            _mapController.move(
+                                _mapController.center, _mapController.zoom + 1);
+                            pickData().then((value) {
+                              position = LatLng(value.latLong.latitude,
+                                  value.latLong.longitude);
+                              _searchController.text = value.address;
+                              
+                              setState(() {});
+                            });
+                          },
+                          child: const Icon(CupertinoIcons.add),
+                        )),
+        
+                           // ---------------------------- zoom out  
+                          Positioned(
+                            bottom: 90,
+                            right: 5,
+                            child: FloatingActionButton(
+                              heroTag: 'btn2',
+                              backgroundColor: Colors.white,
+                              onPressed: () {
+                                _mapController.move(
+                                    _mapController.center, _mapController.zoom - 1);
+                                pickData().then((value) {
+                                  position = LatLng(value.latLong.latitude,
+                                      value.latLong.longitude);
+                                  setState(() {});
+                                });
+                              },
+                              child: const Icon(CupertinoIcons.minus),
+                            )),
+        
+                          // ----------------------------- Get My Position
+                          Positioned(
+                            bottom: 30,
+                            right: 5,
+                            child: FloatingActionButton(
+                              heroTag: 'btn3',
+                              backgroundColor: Colors.white,
+                              onPressed: () async {
+                                final _locationData = await location.getLocation();
+            
+                                _mapController.move(
+                                    LatLng(
+                                        _locationData.latitude ??
+                                           position!.latitude,
+                                        position!.longitude),
+                                    _mapController.zoom);
+                                setNameCurrentPos();
+                              },
+                              child: const Icon(Icons.my_location),
+                            )),
+        
+                          // ----------------------------- Search Bar
+                          Positioned(
+                          top: 17,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            margin: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Column(
+                              children: [                  
+                                StatefulBuilder(builder: ((context, setState) {
+                                  return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount:
+                                          _options.length > 5 ? 5 : _options.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(_options[index].displayname),
+                                          subtitle: Text(
+                                              '${_options[index].lat},${_options[index].lon}'),
+                                          onTap: () {
+                                            _mapController.move(
+                                                LatLng(_options[index].lat,
+                                                    _options[index].lon),
+                                                15.0);
+                                            pickData().then((value) {
+                                              position = LatLng(
+                                                  value.latLong.latitude,
+                                                  value.latLong.longitude);
+                                              _searchController.text = value.address;
+            
+                                              setState(() {});
+                                            });
+            
+                                            _focusNode.unfocus();
+                                            _options.clear();
+                                            setState(() {});
+                                          },
+                                        );
+                                      });
+                                })),
+                              ],
+                            ),
+                          ),
+                        ),     
+              ],
+            );
+          }
+        ),
+        onWillPop: ()async{
+          final values = await showDialog<bool>(
+            context: context,
+             builder: (context){
+              return AlertDialog(
+                title:   Text("Notification",
+                         style: GoogleFonts.poppins(),
+                ),
+                content: const Text("Voulez vous quitter l'application"),
+                actions: [
+                  ElevatedButton(
+                    onPressed: (){
+                      Navigator.of(context).pop(false);
+                    },
+                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                    ),
+                     child:  const Text("No",
+                             style: TextStyle(
+                              color: Colors.black
+                             ),
+                     )),
+                     const SizedBox(width: 6,),
+                   ElevatedButton(
+                    onPressed: (){
+                      Navigator.of(context).pop(true);
+                    },
+                     style: ElevatedButton.styleFrom(
+                      backgroundColor: MyColors.greens
+                    ),
+                     child:  const Text("Exit", style: TextStyle(
+                              color: Colors.black
+                             ),
+                     )),   
+                ],
+              );
+            });
+             if(values != null){
+              return Future.value(values);
+            }
+            else{
+              return Future.value(false);
+            }
+        },
       ),
     );
   }

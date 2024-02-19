@@ -9,7 +9,9 @@ class AssetsFile{
   static const validerJson = '$baseIcons/valider.json';
   static const emptyJson = '$baseIcons/empty.json';
   static const emptyImage1 = '$baseIcons/emtyImage1.json';
-    static const emptyImage = '$baseIcons/emtyImage.json';
+  static const emptyImage = '$baseIcons/emtyImage.json';
+  static const takecompteJson = '$baseIcons/takecompte.json';
+  static const opt = '$baseIcons/otp.json';
 
   
 

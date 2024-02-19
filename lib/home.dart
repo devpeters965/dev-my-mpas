@@ -26,9 +26,9 @@ class HomeScreen extends StatelessWidget {
                     ],
                     children: [
                       const Divider(),
-                      Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: AspectRatio(
+                      const Padding(
+                        padding: EdgeInsets.all(2),
+                        child: const AspectRatio(
                           aspectRatio: 1,
                           // child: Image.asset('flutterfire_300x.png'),
                         ),

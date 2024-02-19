@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
@@ -27,12 +29,13 @@ import 'package:real_track/feature/auth/presentation/page/my_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateLocalCompte extends StatefulWidget {
-  const CreateLocalCompte({super.key, this.userModel,  this.listentAllNote, required this.rowBackEditProfile, this.isar, });
+   CreateLocalCompte({super.key, this.userModel,  this.listentAllNote, required this.rowBackEditProfile, this.isar, this.takecomptes });
   final UserModel? userModel;
   final bool rowBackEditProfile;
   final LocatData? listentAllNote;
   final Isar? isar;
-
+  DocumentSnapshot? takecomptes;
+  
   @override
   State<CreateLocalCompte> createState() => _CreateLocalCompteState();
 }
@@ -66,7 +69,6 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
   }
 
   NotificationService localPushNotification = NotificationService();
-
   final formkey = GlobalKey<FormState>();
 
   final managerkey = GlobalKey<FormState>();
@@ -81,14 +83,17 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
 
    final newLocalDB = LocatData();
    late  UserModel   userEditing = UserModel(
-   id: Isar.autoIncrement,
+   id: 1,
    managerNames: managerName.text,
    bussiness: bussinessName.text,
    phoneName: phoneNumber.text,
-   email: mysemail.text,
+   email:  mysemail.text ,
    desciption: desciption.text,
    commune: userCommune as String,
-   images:  '$_imgesProile' );
+   images:  '$_imgesProile',
+   authEmail: '',
+   authPassword: ''
+    );
 
   late  UserModel   userUpdate = UserModel(
    id: widget.userModel!.id,
@@ -98,23 +103,20 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
    email: mysemail.text,
    desciption: desciption.text,
    commune: userCommune as String,
-   images:  '$_imgesProile' );
-
- 
-
- 
-
-
-     
+   images:  '$_imgesProile',
+   authEmail: '',
+   authPassword: ''
+    );
 
   // late Isar isar;
-  String informaton = "Creer";
+  String informaton =  'Creer';
    @override
   void initState() {
     super.initState();
-    // isar = widget.isar!;
+    informaton = widget.takecomptes != null? "Mdifier" : 'Creer';
+    
  if (widget.userModel != null) {
-      informaton = 'Modifier';
+      informaton =  'Modifier' ;
       managerName.text = widget.userModel!.managerNames;
       bussinessName.text = widget.userModel!.bussiness;
       phoneNumber.text = widget.userModel!.phoneName;
@@ -128,35 +130,35 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
    
   }
 
-  @override
-  void dispose() async{
-    super.dispose();
-    log(mysemail.text);
-    log(desciption.text);
+  // @override
+  // void dispose() async{
+  //   super.dispose();
+  //   log(mysemail.text);
+  //   log(desciption.text);
     
-    if(widget.userModel != null){
-      final userEditing = widget.userModel!.copyWith(
-      managerNames: managerName.text,
-      bussiness: bussinessName.text,
-      phoneName: phoneNumber.text,
-      email: mysemail.text,
-      desciption: desciption.text,
-      commune: userCommune as String,
-      image: '$_imgesProile'
-     );
-    //  newLocalDB.saveData(editProfile: userEditing);
+  //   if(widget.userModel != null){
+  //     final userEditing = widget.userModel!.copyWith(
+  //     managerNames: managerName.text,
+  //     bussiness: bussinessName.text,
+  //     phoneName: phoneNumber.text,
+  //     email: mysemail.text,
+  //     desciption: desciption.text,
+  //     commune: userCommune as String,
+  //     image: '$_imgesProile'
+  //    );
+  //   //  newLocalDB.saveData(editProfile: userEditing);
      
-     return;
-    }
+  //    return;
+  //   }
     
-    // newLocalDB.saveData(editProfile: userEditing);
-    managerName.dispose();
-    bussinessName.dispose();
-    phoneNumber.dispose();
-    mysemail.dispose();
-    // emailControler.dispose();
-    desciption.dispose();
-  }
+  //   // newLocalDB.saveData(editProfile: userEditing);
+  //   managerName.dispose();
+  //   bussinessName.dispose();
+  //   phoneNumber.dispose();
+  //   mysemail.dispose();
+  //   // emailControler.dispose();
+  //   desciption.dispose();
+  // }
    
 
   @override
@@ -177,18 +179,26 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
           },
           child: const Icon(CupertinoIcons.back,color: Colors.white,),
         )
-        :Container()
+        :IconButton(
+          onPressed: (){
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+           icon: const Icon(CupertinoIcons.arrow_left,color: Colors.white,)),
+        title: Text("Edit Profile", style: GoogleFonts.poppins(color: Colors.white),),
+       
       ),
       body: SafeArea(
         child: Container(
+          
           height: MediaQuery.sizeOf(context).height,
           width: MediaQuery.sizeOf(context).width,
           child: Column(
                     children: [
                  SizedBox(
-                   height: 2.h,
+                   height: 13.h,
                   ),
-
+      
                   Expanded(
                   // sinli scrole view
                     child: SingleChildScrollView(
@@ -206,6 +216,8 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                     shape: BoxShape.circle
                                   ),
                               child: CircleAvatar(
+                                radius: 100.r,
+                                backgroundColor: Colors.white,
                                 child: ClipOval(
                                   child: SvgPicture.asset("assets/icons/Online world-cuate.svg",
                                    height: MediaQuery.sizeOf(context).height.h,
@@ -215,7 +227,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                               ),
                             )
                           :
-
+      
                         Container(
                               height: MediaQuery.sizeOf(context).height/4.h,
                              width: MediaQuery.sizeOf(context).width/2.w,
@@ -256,9 +268,9 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                        ]
                       )
                     ),
-
+      
                     SizedBox(height: 15.h),
-
+      
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -337,9 +349,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                               SizedBox(width: 3.w),
                               managerName.text.isEmpty?
                               Icon(CupertinoIcons.pen,color: MyColors.grey,)
-                              : Container()
-
-                          
+                              : Container() 
                         ],
                       ),
                     ),
@@ -349,7 +359,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                     SizedBox(height: 4.h),
                                            
                     GestureDetector(
-                                      onTap:() {
+                                     onTap:() {
                                            showDialog(context: context, builder: ((context) => 
                                           AlertDialog(
                                             title: Text("Ajouter le nom du Business ",
@@ -389,7 +399,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       
                                               TextButton(
                                                 onPressed: (){
-
+      
                                                 if(bussinesKey.currentState!.validate()){
                                                        setState(() {
                                                     Navigator.of(context).pop();
@@ -402,8 +412,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                             ],
                                           )
                                           )
-                                          );     
-                                                          
+                                          );                       
                                       },
                                       child: Container(
                                         margin: EdgeInsets.only(left: 5.sp),
@@ -420,20 +429,18 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                                  bussinessName.text.isEmpty?
                                                  Icon(CupertinoIcons.pen,color: MyColors.grey,)
                                                  : Container()
-
+      
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-
-
                           ],
                         )
                       ],
                     ),
               
-
+      
                    
                     SizedBox(height: 5.h),
                                            
@@ -467,7 +474,6 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                                           return 'nous somme a dix chiffre';
                                                         }
                                                         if (value.contains(RegExp('r[0-9]'))) {
-                                                          
                                                         }
                                                         return null;
                                                       }
@@ -541,9 +547,10 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                       onTap: () {
                                          showDialog(context: context, builder: ((context) => 
                                           AlertDialog(
-                                            title: Text("Ajouter le même Email que a la connexion ",
+                                            title: Text("Ajouter le même Email que avotre connexion ",
+                                            textAlign: TextAlign.center,
                                             style: GoogleFonts.poppins(
-                                              fontSize: 19
+                                              fontSize: 19.sp
                                             ),),
                                             content: SingleChildScrollView(
                                               child: Form(
@@ -706,7 +713,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                     )
                                        ],
                                     ),
-
+      
                         SizedBox(height: 10.h),
                                                          
                      GestureDetector(
@@ -770,7 +777,7 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                             Text("Description",
                                             style: GoogleFonts.poppins(fontSize: 23.sp)
                                             ),
-
+      
                                             SizedBox(width: 3.h),
                                                desciption .text.isEmpty?
                                                Icon(CupertinoIcons.pen,color: MyColors.grey,)
@@ -895,8 +902,14 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
 
                                         if(informaton == "Creer"){
 
-                                               UserCase.usercase.addUserInfo(userEditing);
-                                                 CreatUser().upLoadData(_image!);
+                                                   UserCase.usercase.updateUserInfo(userEditing) ;
+                                                    CreatUser().upLoadData(_image!);
+                                                  // // :  
+                                                  // UserCase.usercase.addUserInfo(userEditing);
+                                                  //  widget.userModel != null?
+                                                  //    AddUser().upLoadData(_image!)
+                                                  //  :
+                                                     
                                                  
                                                  SharedPreferences preferences = await  SharedPreferences.getInstance();
                                                  preferences.setBool('isValidationDone', true);
@@ -904,20 +917,31 @@ class _CreateLocalCompteState extends State<CreateLocalCompte> {
                                                    // ignore: use_build_context_synchronously
                                                    Navigator.push(context, MaterialPageRoute(builder: ((context) => 
                                                    MyProfile())));
-                                                   localPushNotification.showNotification(title: "Studio track", body: "Votre compte a été crée avec success!");
+                                                // await   localPushNotification.showNotification(title: "Studio track", body: "Votre compte a été crée avec success!");
                                         }
                                          if(informaton == "Modifier"){
-                                          
-                                                   UserCase.usercase.updateUserInfo(userUpdate);
-                                                    AddUser().upLoadData(_image!);
 
-                                                   // ignore: use_build_context_synchronously
+                                                  // widget.userModel == null? 
+                                                  // UserCase.usercase.addUserInfo(userEditing)
+                                                // : 
+                                                 UserCase.usercase.updateUserInfo(userUpdate);
+                                                 AddUser().upLoadData(_image!);
+                                                 
+                                                  // widget.userModel == null?
+                                                    //  CreatUser().upLoadData(_image!)
+                                                  // : 
+                                                   
+                                            
+                                                  //  UserCase.usercase.updateUserInfo(userUpdate);
+                                                    // AddUser().upLoadData(_image!);
+
+                                                  
                                                     Navigator.push(context, MaterialPageRoute(builder: ((context) => 
                                                     MyProfile())));
 
                                               SharedPreferences preferences = await  SharedPreferences.getInstance();
                                                 preferences.setBool('isValidationDone', true);
-                                                localPushNotification.showNotification(title: "Studio track", body: "Votre profile a été modifié avec success!");
+                                              // await  localPushNotification.showNotification(title: "Studio track", body: "Votre profile a été modifié avec success!");
                                         }
                                       },
                                       child:   const Text("Yes")

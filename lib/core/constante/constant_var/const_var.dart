@@ -10,17 +10,9 @@ final bussinessName = TextEditingController();
 final phoneNumber = TextEditingController();
 final mysemail = TextEditingController();
 final desciption = TextEditingController();
-
+final otpcontroller = TextEditingController();
 late Object? userCommune  = "Abidjan";
-// final marque = TextEditingController();
 
-// final email = TextEditingController();
-
-
-
-
-// late Position? longitude ;
-// // late Position? latitude;
 late Future< Position?> position;
 
  String detailText = 'électronique, restant essentiellement inchangé. Il a été popularisé dans les années 1960 avec la sortie de feuilles Letraset contenant des passages de Lorem Ipsum, et plus récemment avec des logiciels de publication assistée par ordinateur comme Aldus PageMaker comprenant des versions de Lorem Ipsum.';
@@ -40,20 +32,11 @@ late Future< Position?> position;
 'Yopougon'];
 
 
-// -----------------------
-
+// ------------ base icon path
  const baseIcons = "assets/icons";
 
 
 // ------------------- Local Data Base Value
-// late String name;
-// late String tell;
-// late String email;
-// late String site;
-// late String images;
-// late String informationDescription;
-
-
   late String userInfo = '';
 
   late List searcResulat = [];
@@ -84,10 +67,6 @@ late Future< Position?> position;
 
  bool modifieIconsCommune = false;
  bool modifieIconsTell = false;
-
-
-
-
 
 
 class OSMdata {
@@ -124,4 +103,7 @@ class PickedData {
 
   PickedData(this.latLong, this.address);
 }
+
+
+
 

@@ -31,6 +31,9 @@ class AddUser{
      Object? communes,
     required String uploadTimes,
     required String desciption,
+     String? authEmail,
+     String? authPassword
+
     
   
   })async{
@@ -53,7 +56,9 @@ class AddUser{
       'communes': communes,
       'times': uploadTimes,
       'latitude': GeoPoint(position.latitude, position.longitude),
-      'description':desciption
+      'description':desciption,
+      'authEmail': authEmail,
+      'password': authPassword,
   
     });
         
@@ -79,7 +84,7 @@ class AddUser{
                     uploadTimes: uploadFileTime.toString(),
                     images: image,
                     communes: userCommune,
-                    desciption: desciption.text 
+                    desciption: desciption.text,
                     );
       debugPrint('-------------------- UpLoad Data Into FB ');
       debugPrint('------------------- Update body : $body');              

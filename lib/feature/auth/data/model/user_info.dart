@@ -16,6 +16,8 @@ class UserModel {
   final String email;
   final String desciption;
   final String commune;
+  late final String? authEmail;
+  final String? authPassword;
 
   UserModel({
     required this.id,
@@ -26,6 +28,8 @@ class UserModel {
     required this.email,
     required this.desciption,
     required this.commune,
+    this.authEmail,
+    this.authPassword
   });
  
 
@@ -38,6 +42,8 @@ class UserModel {
     String? email,
     String? desciption,
     String? commune, 
+    String? authEmail,
+    String? authPassword
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -48,6 +54,8 @@ class UserModel {
       email: email ?? this.email,
       desciption: desciption ?? this.desciption,
       commune:commune ?? this.commune ,
+      authEmail: authEmail?? this.authEmail,
+      authPassword: authPassword ?? this.authPassword
     );
   }
 
@@ -61,6 +69,8 @@ class UserModel {
       'email': email,
       'desciption': desciption,
       'commune': commune,
+      'authEmail':authEmail,
+      'authPassword':authPassword
     };
   }
 
@@ -73,7 +83,9 @@ class UserModel {
       phoneName: map['phoneName'] as String,
       email: map['email'] as String,
       desciption: map['desciption'] as String,
-      commune: map['commune'] 
+      commune: map['commune'],
+      authEmail: map['authEmail'] as String,
+      authPassword: map['authPassword']
     );
   }
 
@@ -83,7 +95,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(managerNames: id: $id,images:$images  $managerNames, bussiness: $bussiness, phoneName: $phoneName, email: $email, desciption: $desciption, commune: $commune)';
+    return 'UserModel(managerNames:$managerNames, id: $id,images:$images  , bussiness: $bussiness, phoneName: $phoneName, email: $email, desciption: $desciption, commune: $commune, authEmail: $authEmail, authPassword: $authPassword )';
   }
 
   @override
@@ -98,7 +110,9 @@ class UserModel {
       other.phoneName == phoneName &&
       other.email == email &&
       other.desciption == desciption &&
-      other.commune == commune;
+      other.commune == commune &&
+      other.authEmail == authEmail &&
+      other.authPassword == authPassword;
   }
 
   @override
@@ -110,6 +124,9 @@ class UserModel {
       phoneName.hashCode ^
       email.hashCode ^
       desciption.hashCode ^
-      commune.hashCode;
+      commune.hashCode ^
+      authEmail.hashCode ^
+      authPassword.hashCode;
+     
   }
 }

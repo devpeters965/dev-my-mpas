@@ -40,6 +40,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/Feeling sorry-pana.svg
   String get feelingSorryPana => 'assets/icons/Feeling sorry-pana.svg';
 
+  /// File path: assets/icons/Group discussion-cuate.svg
+  String get groupDiscussionCuate => 'assets/icons/Group discussion-cuate.svg';
+
   /// File path: assets/icons/Image post-cuate.svg
   String get imagePostCuate => 'assets/icons/Image post-cuate.svg';
 
@@ -58,11 +61,23 @@ class $AssetsIconsGen {
   /// File path: assets/icons/Social media-cuate.svg
   String get socialMediaCuate => 'assets/icons/Social media-cuate.svg';
 
+  /// File path: assets/icons/Thinking face-cuate.svg
+  String get thinkingFaceCuate => 'assets/icons/Thinking face-cuate.svg';
+
   /// File path: assets/icons/Travelers-pana.svg
   String get travelersPana => 'assets/icons/Travelers-pana.svg';
 
   /// File path: assets/icons/deleted.json
   String get deleted => 'assets/icons/deleted.json';
+
+  /// File path: assets/icons/empty.json
+  String get empty => 'assets/icons/empty.json';
+
+  /// File path: assets/icons/emptyImage.json
+  String get emptyImage => 'assets/icons/emptyImage.json';
+
+  /// File path: assets/icons/emtyImage1.json
+  String get emtyImage1 => 'assets/icons/emtyImage1.json';
 
   /// File path: assets/icons/maker.svg
   String get maker => 'assets/icons/maker.svg';
@@ -78,14 +93,19 @@ class $AssetsIconsGen {
         directionsBro,
         directionsPana,
         feelingSorryPana,
+        groupDiscussionCuate,
         imagePostCuate,
         locationReviewBro,
         onlineWorldCuate,
         personalSettingsPana,
         personalSitePana,
         socialMediaCuate,
+        thinkingFaceCuate,
         travelersPana,
         deleted,
+        empty,
+        emptyImage,
+        emtyImage1,
         maker,
         valider
       ];

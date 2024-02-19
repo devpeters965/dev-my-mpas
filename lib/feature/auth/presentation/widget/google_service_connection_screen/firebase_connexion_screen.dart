@@ -2,12 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:real_track/config/theme/assets.dart';
 import 'package:real_track/feature/auth/presentation/page/principal_maps.dart';
-
-// import 'home.dart';
 
 
 class AuthGate extends StatelessWidget {
@@ -19,8 +18,10 @@ class AuthGate extends StatelessWidget {
      stream: FirebaseAuth.instance.authStateChanges(),
      builder: (context, snapshot) {
        if (!snapshot.hasData) {
+        
          return SignInScreen(
-          
+           showPasswordVisibilityToggle: true,
+           oauthButtonVariant:  OAuthButtonVariant.icon_and_text ,
            providers: [
              EmailAuthProvider(),
              GoogleProvider(
@@ -31,7 +32,7 @@ class AuthGate extends StatelessWidget {
         
            subtitleBuilder: (context, action) {
              return Padding(
-               padding: const EdgeInsets.symmetric(vertical: 8.0),
+               padding:  EdgeInsets.symmetric(vertical: 12.h),
                child: action == AuthAction.signIn
                    ? const Text('Welcome to FlutterFire, please sign in!')
                    : const Text('Welcome to Flutterfire, please sign up!'),

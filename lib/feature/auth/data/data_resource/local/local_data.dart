@@ -17,7 +17,7 @@ class LocatData extends ChangeNotifier{
 
   late Future<Isar> db;
   late List<UserModel> currentUsers = [];
-  LocatData(){
+   LocatData(){
     db = openDB();
     
   }
@@ -29,7 +29,7 @@ class LocatData extends ChangeNotifier{
       return await Isar.open([UserModelSchema], inspector: true, directory: dir.path);
     }
     return Future.value(Isar.getInstance());
-  }
+  } 
 
    // ------------------- Sava Data
   Future<void> saveData({required UserModel editProfile})async{

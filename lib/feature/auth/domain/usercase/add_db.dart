@@ -31,6 +31,8 @@ class CreatUser{
      Object? communes,
     required String uploadTimes,
     required String desciption,
+    String? authEmail,
+     String? authPassword
     
   
   })async{
@@ -50,7 +52,9 @@ class CreatUser{
       'communes': communes,
       'times': uploadTimes,
       'latitude': GeoPoint(position.latitude, position.longitude),
-      'description':desciption
+      'description':desciption,
+      'authEmail': authEmail,
+      'password': authPassword,
   
     });
     print('==== User created  lalt ${position.altitude} long ${position.longitude}');  

@@ -13,13 +13,8 @@ class NotificationPush {
 
     await OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
     await OneSignal.shared.setAppId('4ae76a24-eeed-4979-93b5-a35d8ca13996');
-    
-
-       OneSignal.shared.promptUserForPushNotificationPermission().then((pushnotification) {
+     OneSignal.shared.promptUserForPushNotificationPermission().then((pushnotification) {
         log("user permission $pushnotification" as num );
        });
-
-
   }
-
 }

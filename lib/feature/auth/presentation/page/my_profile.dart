@@ -138,293 +138,347 @@ class _MyProfileState extends State<MyProfile> {
          )
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(    
-            children: [
-              
-               SizedBox(
-                height: MediaQuery.sizeOf(context).height,
-                 child: StreamBuilder<List<UserModel>?>(
-                  stream:  UserCase.usercase.getUserInfo(),
-                  //  stream:  LocatData().allEdit(),
-                  // stream: LocatData().fectAllNote(),
-                    builder: (context , snapshort){
-                     if(snapshort.connectionState == ConnectionState.waiting){
-                       print("-------- data isSvace into local db ");
-                       return SizedBox(
-                        height: MediaQuery.sizeOf(context).height,
-                        width: MediaQuery.sizeOf(context).width,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                           CircularProgressIndicator(
-                            color: MyColors.greens,
-                           )
-                          ],
-                        ),
-                       );
-          
-                     }
-          
-                     if(!snapshort.hasData){
-                       return SizedBox(
-                        height: MediaQuery.sizeOf(context).height,
-                        width: MediaQuery.sizeOf(context).width,
-                        child: const Column(
-                          children: [
-                           Text("aucune donnee")
-                          ],
-                        ),
-                       );
-                     }
-                     print('------------- local db data ${snapshort.data}');
-                 
-                     final userInfo = snapshort.data;
-                 
-                     return ListView.builder(
-                       itemCount: userInfo!.length,
-                       itemBuilder: (context, index){
-                          userItem = userInfo[index];
-                         print('-------------my image ${userItem.images}');
-                       return Column(
-                       children: [
-                        const  SizedBox(height: 10),
-          
-                               Align(
-                                  alignment: Alignment.center,
-                                  child: Stack(
-                                    children:[
-                                      userItem.images.isNotEmpty?
-          
-                                      Container(
-                                        height: MediaQuery.sizeOf(context).height/4.h,
-                                        width: MediaQuery.sizeOf(context).width/2.w,
-                                            decoration: const BoxDecoration(
-                                              // shape: BoxShape.circle
-                                            ),
-                                        child: CircleAvatar(
-                                          radius: 100,
-                                          child: ClipOval(
-                                          child: Image.file(File(userItem.images),
-                                           height: MediaQuery.sizeOf(context).height/2.h,
-                                           width: MediaQuery.sizeOf(context).width/2.w,
-                                           fit: BoxFit.cover,
-
-                                          )),
-                                        ),
-                                       )
-          
-                                      :
-                                        Container(
-                                            height: 200.h,
-                                            width: 200.w,
-                                            decoration: const BoxDecoration(
-                                              // color: Colors.red,
-                                              shape: BoxShape.circle
-                                            ),
-                                        child: SvgPicture.asset("assets/icons/Online world-cuate.svg"),
-                                      ),
-                                    ]
-                                  )
-                                ),
-                      
-
-                          SizedBox(height: 15.h),
-
-                          Row(
+      body: WillPopScope(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(    
+              children: [
+                
+                 SizedBox(
+                  height: MediaQuery.sizeOf(context).height,
+                   child: StreamBuilder<List<UserModel>?>(
+                    stream:  UserCase.usercase.getUserInfo(),
+                    //  stream:  LocatData().allEdit(),
+                    // stream: LocatData().fectAllNote(),
+                      builder: (context , snapshort){
+                       if(snapshort.connectionState == ConnectionState.waiting){
+                         print("-------- data isSvace into local db ");
+                         return SizedBox(
+                          height: MediaQuery.sizeOf(context).height,
+                          width: MediaQuery.sizeOf(context).width,
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Column(
-                                children: [
-                                    GestureDetector(
-                               child: Container(
-                                 margin: EdgeInsets.only(left: 5.sp),
-                                 child: Align(
-                                   alignment: Alignment.topLeft,
-                                   child: Text(
-                                     userItem.managerNames.isNotEmpty?
-                                     userItem.managerNames
-                                    : "Info non valide",
-                                     style: GoogleFonts.poppins(fontSize: 20.sp)
-                                     ),
-                                 ),
-                               ),
-                                                       ),
-                                               
-                                                      
-                                               
-                                                       SizedBox(
-                               child: GestureDetector(
+                             CircularProgressIndicator(
+                              color: MyColors.greens,
+                             )
+                            ],
+                          ),
+                         );
+            
+                       }
+            
+                       if(!snapshort.hasData){
+                         return SizedBox(
+                          height: MediaQuery.sizeOf(context).height,
+                          width: MediaQuery.sizeOf(context).width,
+                          child: const Column(
+                            children: [
+                             Text("aucune donnee")
+                            ],
+                          ),
+                         );
+                       }
+                       print('------------- local db data ${snapshort.data}');
+                   
+                       final userInfo = snapshort.data;
+                   
+                       return ListView.builder(
+                         itemCount: userInfo!.length,
+                         itemBuilder: (context, index){
+                            userItem = userInfo[index];
+                           print('-------------my image ${userItem.images}');
+                         return Column(
+                         children: [
+                          const  SizedBox(height: 10),
+            
+                                 Align(
+                                    alignment: Alignment.center,
+                                    child: Stack(
+                                      children:[
+                                        userItem.images.isNotEmpty?
+            
+                                        Container(
+                                          height: MediaQuery.sizeOf(context).height/4.h,
+                                          width: MediaQuery.sizeOf(context).width/2.w,
+                                              decoration: const BoxDecoration(
+                                                // shape: BoxShape.circle
+                                              ),
+                                          child: CircleAvatar(
+                                            radius: 100,
+                                            child: ClipOval(
+                                            child: Image.file(File(userItem.images),
+                                             height: MediaQuery.sizeOf(context).height/2.h,
+                                             width: MediaQuery.sizeOf(context).width/2.w,
+                                             fit: BoxFit.cover,
+        
+                                            )),
+                                          ),
+                                         )
+            
+                                        :
+                                          Container(
+                                              height: 200.h,
+                                              width: 200.w,
+                                              decoration: const BoxDecoration(
+                                                // color: Colors.red,
+                                                shape: BoxShape.circle
+                                              ),
+                                          child: SvgPicture.asset("assets/icons/Online world-cuate.svg"),
+                                        ),
+                                      ]
+                                    )
+                                  ),
+                        
+        
+                            SizedBox(height: 15.h),
+        
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                      GestureDetector(
                                  child: Container(
                                    margin: EdgeInsets.only(left: 5.sp),
                                    child: Align(
                                      alignment: Alignment.topLeft,
                                      child: Text(
-                                      userItem.bussiness.isNotEmpty?
-                                       userItem.bussiness
-                                      : "Aucune Activé",
-                              
+                                       userItem.managerNames.isNotEmpty?
+                                       userItem.managerNames
+                                      : "Info non valide",
                                        style: GoogleFonts.poppins(fontSize: 20.sp)
                                        ),
                                    ),
                                  ),
-                               ),
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                       
-                 
-                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                      GestureDetector(                           
-                           child: Container(
-                             margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
-                             child: Column(
-                             children: [
-                               Container(
-                                 padding: EdgeInsets.all(9.sp),
-                                 decoration: BoxDecoration(
-                                   color: MyColors.grey,
-                                  borderRadius: BorderRadius.circular(5.sp)
-                                 ),
-                                 child: const Icon(Icons.phone) ,
-                               ),
-                               SizedBox(
-                                 height: 5.h,
-                               ),
-                               Text(userItem.phoneName.isNotEmpty?
-                                userItem.phoneName
-                               : 'numéro invalide'
-                               ,
-                               style: GoogleFonts.poppins(
-                                 fontSize: 11.sp
-                               ),)
-                             ],
-                           ),
-                           ),
-                         ),
-                           
-                          GestureDetector(
-                           child: Container(
-                             margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
-                             child: Column(
-                             children: [
-                               Container(
-                                 padding: EdgeInsets.all(9.sp),
-                                 decoration: BoxDecoration(
-                                   color: MyColors.grey,
-                                  borderRadius: BorderRadius.circular(5.sp)
-                                 ),
-                                 child: const Icon(Icons.email) ,
-                               ),
-                               SizedBox(
-                                 height: 5.h,
-                               ),
-                               Text(userItem.email.isNotEmpty?
-                                userItem.email
-                               : 'email invalide'
-                               ,
-                               style: GoogleFonts.poppins(
-                                 fontSize: 11.sp
-                               ),)
-                             ],
-                           ),
-                           ),
-                         ),
-                           
-                           
-                          GestureDetector(
-                           child: Container(
-                             margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
-                             child: Column(
-                             children: [
-                               Container(
-                                 padding: EdgeInsets.all(9.sp),
-                                 decoration: BoxDecoration(
-                                   color: MyColors.grey,
-                                  borderRadius: BorderRadius.circular(5.sp)
-                                 ),
-                                 child: const Icon(Icons.place_sharp) ,
-                               ),
-                               SizedBox(
-                                 height: 5.h,
-                               ),
-                               Text(userItem.commune == "Abidjan" ?
-                                'aucune commune'
-                                :
-                                 userItem.commune ,
-                              //  : 'aucune commune',
+                                                         ),
+                                                 
+                                                        
+                                                 
+                                                         SizedBox(
+                                 child: GestureDetector(
+                                   child: Container(
+                                     margin: EdgeInsets.only(left: 5.sp),
+                                     child: Align(
+                                       alignment: Alignment.topLeft,
+                                       child: Text(
+                                        userItem.bussiness.isNotEmpty?
+                                         userItem.bussiness
+                                        : "Aucune Activé",
                                 
-                               style: GoogleFonts.poppins(
-                                 fontSize: 11.sp
-                               ),)
-                             ],
-                           ),
-                           ),
-                         )
-                   
-                   ],
-                 ),
-
-                 SizedBox(height: 10.h),
-                 
-                 GestureDetector(
-                   child: Text('description',
-                   style: GoogleFonts.poppins(fontSize: 23.sp)
-                 ),),
-                 
-                 
-                 SizedBox(
-                    height: 14.h,
-                   ),
-                   
-                   userItem.desciption.isNotEmpty?
-                     Container(
-                   padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
-                   child: Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                     children: [
-                        SizedBox(
-                           width: MediaQuery.sizeOf(context).width/2,
-                           child:  SingleChildScrollView(
-                                      child:  ReadMoreText(
-                                        userItem.desciption,
-                                        trimLines: 3,
-                                        textAlign: TextAlign.start,
-                                        trimCollapsedText: "Show More",
-                                        trimExpandedText: "Show Less",
-                                        moreStyle: TextStyle(color: MyColors.greens),
-                                        lessStyle: TextStyle(color: MyColors.greens),
-                                        style: GoogleFonts.poppins(),
+                                         style: GoogleFonts.poppins(fontSize: 20.sp)
+                                         ),
+                                     ),
+                                   ),
+                                 ),
                                       ),
-                                    )
-                         ),
-                       Expanded(
-                         child: SvgPicture.asset(AssetsFile.socialMediasvg,
-                         width: MediaQuery.sizeOf(context).width/2,
-                         ),
-                       )
+                                  ],
+                                ),
+                              ],
+                            ),
+        
+                         
+                   
+                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                       children: [
+                        GestureDetector(                           
+                             child: Container(
+                               margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                               child: Column(
+                               children: [
+                                 Container(
+                                   padding: EdgeInsets.all(9.sp),
+                                   decoration: BoxDecoration(
+                                     color: MyColors.grey,
+                                    borderRadius: BorderRadius.circular(5.sp)
+                                   ),
+                                   child: const Icon(Icons.phone) ,
+                                 ),
+                                 SizedBox(
+                                   height: 5.h,
+                                 ),
+                                 Text(userItem.phoneName.isNotEmpty?
+                                  userItem.phoneName
+                                 : 'numéro invalide'
+                                 ,
+                                 style: GoogleFonts.poppins(
+                                   fontSize: 11.sp
+                                 ),)
+                               ],
+                             ),
+                             ),
+                           ),
+                             
+                            GestureDetector(
+                             child: Container(
+                               margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                               child: Column(
+                               children: [
+                                 Container(
+                                   padding: EdgeInsets.all(9.sp),
+                                   decoration: BoxDecoration(
+                                     color: MyColors.grey,
+                                    borderRadius: BorderRadius.circular(5.sp)
+                                   ),
+                                   child: const Icon(Icons.email) ,
+                                 ),
+                                 SizedBox(
+                                   height: 5.h,
+                                 ),
+                                 Text(userItem.email.isNotEmpty?
+                                  userItem.email
+                                 : 'email invalide'
+                                 ,
+                                 style: GoogleFonts.poppins(
+                                   fontSize: 11.sp
+                                 ),)
+                               ],
+                             ),
+                             ),
+                           ),
+                             
+                             
+                            GestureDetector(
+                             child: Container(
+                               margin: EdgeInsets.symmetric(vertical: 9.h, horizontal: 5.w),
+                               child: Column(
+                               children: [
+                                 Container(
+                                   padding: EdgeInsets.all(9.sp),
+                                   decoration: BoxDecoration(
+                                     color: MyColors.grey,
+                                    borderRadius: BorderRadius.circular(5.sp)
+                                   ),
+                                   child: const Icon(Icons.place_sharp) ,
+                                 ),
+                                 SizedBox(
+                                   height: 5.h,
+                                 ),
+                                 Text(userItem.commune == "Abidjan" ?
+                                  'aucune commune'
+                                  :
+                                   userItem.commune ,
+                                //  : 'aucune commune',
+                                  
+                                 style: GoogleFonts.poppins(
+                                   fontSize: 11.sp
+                                 ),)
+                               ],
+                             ),
+                             ),
+                           )
+                     
                      ],
                    ),
-                 )
-                   : const EmptyView()         
+        
+                   SizedBox(height: 10.h),
+                   
+                   GestureDetector(
+                     child: Text('description',
+                     style: GoogleFonts.poppins(fontSize: 23.sp)
+                   ),),
+                   
+                   
+                   SizedBox(
+                      height: 14.h,
+                     ),
+                     
+                     userItem.desciption.isNotEmpty?
+                       Container(
+                     padding:  EdgeInsets.symmetric(vertical: 8.h, horizontal: 5.h),
+                     child: Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                       children: [
+                          SizedBox(
+                             width: MediaQuery.sizeOf(context).width/2,
+                             child:  SingleChildScrollView(
+                                        child:  ReadMoreText(
+                                          userItem.desciption,
+                                          trimLines: 3,
+                                          textAlign: TextAlign.start,
+                                          trimCollapsedText: "Show More",
+                                          trimExpandedText: "Show Less",
+                                          moreStyle: TextStyle(color: MyColors.greens),
+                                          lessStyle: TextStyle(color: MyColors.greens),
+                                          style: GoogleFonts.poppins(),
+                                        ),
+                                      )
+                           ),
+                         Expanded(
+                           child: SvgPicture.asset(AssetsFile.socialMediasvg,
+                           width: MediaQuery.sizeOf(context).width/2,
+                           ),
+                         )
                        ],
-                     );
-                 
-                     });
-                       }),
-               ),
-                SizedBox(
-                 height: 9.h,
-                )
-             ],
+                     ),
+                   )
+                     : const EmptyView()         
+                         ],
+                       );
+                   
+                       });
+                         }),
+                 ),
+                  SizedBox(
+                   height: 9.h,
+                  )
+               ],
+            ),
           ),
         ),
+         onWillPop: ()async{
+          final values = await showDialog<bool>(
+            context: context,
+             builder: (context){
+              return AlertDialog(
+                title:   Text("Notification",
+                         style: GoogleFonts.poppins(),
+                ),
+                content: const Text("Voulez vous quitter l'application"),
+                actions: [
+                  ElevatedButton(
+                    onPressed: (){
+                      Navigator.of(context).pop(false);
+                    },
+                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+
+                    ),
+                     child:  const Text("No",
+                             style: TextStyle(
+                              color: Colors.black
+                             ),
+                     
+                     )),
+
+                     const SizedBox(width: 6,),
+
+                   ElevatedButton(
+                    onPressed: (){
+                      Navigator.of(context).pop(true);
+                    },
+                     style: ElevatedButton.styleFrom(
+                      backgroundColor: MyColors.greens
+
+                    ),
+                     child:  const Text("Exit", style: TextStyle(
+                              color: Colors.black
+                             ),
+                     )),   
+                ],
+                
+                
+              );
+            });
+             if(values != null){
+              return Future.value(values);
+            }
+            else{
+              return Future.value(false);
+            }
+
+        },
       ),
       floatingActionButton:  FloatingActionButton(
         backgroundColor: MyColors.greens,
